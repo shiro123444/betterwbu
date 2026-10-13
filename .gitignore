@@ -1,0 +1,23 @@
+# Publish the maintained extension and synthetic tests only.
+/*
+!/.gitignore
+!/README.md
+!/development/
+/development/*
+!/development/reimbursement-enhancer/
+/development/reimbursement-enhancer/*
+!/development/reimbursement-enhancer/package.json
+!/development/reimbursement-enhancer/extension/
+!/development/reimbursement-enhancer/tests/
+
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Local screenshots, audit responses, archived builds and Git metadata stay local.
+.git-local/
+diagnostics/
+browser-verification*.json
+browser-preview*.json
+*.zip

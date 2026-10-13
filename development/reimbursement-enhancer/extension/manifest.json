@@ -1,0 +1,98 @@
+{
+  "manifest_version": 3,
+  "name": "报销系统交互优化",
+  "version": "0.11.9",
+  "minimum_chrome_version": "111",
+  "description": "改善报销布局与发票加载，预览生成费用明细，复用收款资料并同步金额。",
+  "permissions": [
+    "storage",
+    "declarativeNetRequest"
+  ],
+  "host_permissions": [
+    "http://wsbx.wbu.edu.cn/*",
+    "https://wsbx.wbu.edu.cn/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "报销系统交互优化"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://wsbx.wbu.edu.cn/workbench-web/*",
+        "https://wsbx.wbu.edu.cn/workbench-web/*"
+      ],
+      "js": [
+        "core.js",
+        "memory-core.js",
+        "memory-bridge.js",
+        "basic-core.js",
+        "basic-bridge.js",
+        "expenses.js",
+        "invoice-core.js",
+        "invoices.js",
+        "enhance.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "http://wsbx.wbu.edu.cn/workbench-web/*",
+        "https://wsbx.wbu.edu.cn/workbench-web/*"
+      ],
+      "js": [
+        "memory-core-isolated.js",
+        "basic-core-http-isolated.js",
+        "control.js",
+        "memory.js",
+        "basic-ui-http.js",
+        "memory-manager.js",
+        "actions.js",
+        "polish.js",
+        "waiting.js",
+        "layout.js",
+        "wallet-feedback.js",
+        "wallet-layout.js",
+        "audit-layout.js"
+      ],
+      "css": [
+        "polish.css"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "http://wsbx.wbu.edu.cn/bill-wallet-web/*",
+        "https://wsbx.wbu.edu.cn/bill-wallet-web/*"
+      ],
+      "js": [
+        "actions.js",
+        "polish.js",
+        "wallet-feedback.js",
+        "wallet-layout.js",
+        "waiting.js"
+      ],
+      "css": [
+        "polish.css"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "http://wsbx.wbu.edu.cn/bill-wallet-web/*",
+        "https://wsbx.wbu.edu.cn/bill-wallet-web/*"
+      ],
+      "js": [
+        "wallet-bridge.js"
+      ],
+      "world": "MAIN",
+      "all_frames": true,
+      "run_at": "document_start"
+    }
+  ]
+}

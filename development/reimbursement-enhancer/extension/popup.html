@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>报销系统交互优化</title>
+<style>
+body{font:14px system-ui;margin:16px;width:260px;color:rgba(0,0,0,.85)}
+#version{font-size:12px;color:rgba(0,0,0,.65);margin-bottom:12px}
+.actions{display:flex;gap:8px}
+button{font:inherit;border:1px solid #d9d9d9;border-radius:4px;background:#fff;padding:7px 12px;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}button:focus-visible{outline:2px solid #1890ff;outline-offset:2px}
+#status{font-size:12px;line-height:1.6;margin-top:10px;white-space:pre-line;color:rgba(0,0,0,.65)}
+</style>
+<div id="version"></div>
+<div class="actions"><button id="open" disabled>打开信息管理</button><button id="retry">重新检查</button></div>
+<div id="status" role="status" aria-live="polite"></div>
+<script src="popup.js"></script>
+</html>

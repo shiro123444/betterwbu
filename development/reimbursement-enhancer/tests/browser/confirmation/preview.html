@@ -1,0 +1,4 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><style>body{margin:0;font:16px system-ui;color:#586578}#list{height:140px;box-sizing:border-box;padding:22px;background:#f9fbfd;border:1px solid #dce6f2;border-radius:5px}</style><div id="app"><div id="list">旧预览：等待新的票据数据与布局。</div></div><script>
+let next;const list=document.getElementById('list'),component={sourceData:[{id:'old'}],$refs:{fileList:list},$children:[]};document.getElementById('app').__vue__=component;
+window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==location.origin)return;let d=e.data;if(typeof d==='string')try{d=JSON.parse(d)}catch{return};if(d.action==='billDetails')next=d.data;if(d.demo==='ready'&&next){component.sourceData=next.map(b=>({...b}));list.textContent='新预览已就绪：'+component.sourceData.length+' 张合成票据（高度保持不变）';next=null}});
+</script><script src="/extension/wallet-bridge.js"></script></html>
