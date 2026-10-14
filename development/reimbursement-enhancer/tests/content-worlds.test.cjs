@@ -1,5 +1,14 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs'),path=require('node:path');
 const dir=path.join(__dirname,'../extension'),manifest=JSON.parse(fs.readFileSync(path.join(dir,'manifest.json'),'utf8'));
+
+test('workbench and embedded invoice wallet load the shared component theme after layout styles',()=>{
+ for(const route of ['/workbench-web/','/bill-wallet-web/']){
+  const entry=manifest.content_scripts.find(s=>s.css&&s.matches.some(m=>m.includes(route)));
+  assert.ok(entry.css.includes('components.css'),route+' must include shared controls and native label concealment');
+  assert.ok(entry.css.indexOf('components.css')>entry.css.indexOf('workspace.css'));
+  if(route.includes('bill-wallet'))assert.equal(entry.all_frames,true);
+ }
+});
 test('memory core uses distinct resources for main and isolated worlds, and initializes both',()=>{
  const entries=manifest.content_scripts.filter(s=>s.matches.some(m=>m.includes('/workbench-web/'))),seen=new Set();
  for(const entry of entries){

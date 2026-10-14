@@ -28,13 +28,13 @@ html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item-selected:hover {backgro
 html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item:after {display:none!important}
 html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title {color:var(--bw-ink);font-weight:600;padding:6px 8px!important}
 html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title:after {margin-left:auto;color:#8b96a6}
-html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title>.anticon,html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title>.menu-icon {display:none!important}
-html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title:before {content:"";display:block;flex:0 0 34px;width:34px;height:34px;border-radius:10px;background-color:#e6eeff;mask:center/20px no-repeat; -webkit-mask:center/20px no-repeat}
-html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title[aria-label*="报账"]:before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3h14v18l-3-2-4 2-4-2-3 2V3ZM8 7h8M8 11h8M8 15h5'/%3E%3C/svg%3E");-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3h14v18l-3-2-4 2-4-2-3 2V3ZM8 7h8M8 11h8M8 15h5'/%3E%3C/svg%3E");background-color:#2878ff}
-html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title[aria-label*="待办"]:before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='m8 9 2 2 5-5M8 16h8'/%3E%3C/svg%3E");-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='m8 9 2 2 5-5M8 16h8'/%3E%3C/svg%3E");background-color:#32a477}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title>.anticon,html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title>.menu-icon,html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title>.ant-menu-item-icon {display:none!important}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title:before {content:"";display:block;flex:0 0 34px;width:34px;height:34px;border-radius:10px;background-color:#687385;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='M8 8h8M8 12h8M8 16h5'/%3E%3C/svg%3E") center/20px no-repeat;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='M8 8h8M8 12h8M8 16h5'/%3E%3C/svg%3E") center/20px no-repeat}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title:is([aria-label*="报账"],[data-menu-id="报账管理"]):before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3h14v18l-3-2-4 2-4-2-3 2V3ZM8 7h8M8 11h8M8 15h5'/%3E%3C/svg%3E");-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 3h14v18l-3-2-4 2-4-2-3 2V3ZM8 7h8M8 11h8M8 15h5'/%3E%3C/svg%3E");background-color:#2878ff}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title:is([aria-label*="待办"],[data-menu-id="待办中心"]):before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='m8 9 2 2 5-5M8 16h8'/%3E%3C/svg%3E");-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='m8 9 2 2 5-5M8 16h8'/%3E%3C/svg%3E");background-color:#32a477}
 html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item a {display:flex;align-items:center;gap:10px;min-width:0;min-height:40px;color:inherit;white-space:normal;overflow-wrap:anywhere}
 html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item a>.anticon {display:none!important}
-html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item a:before {content:"";display:block;flex:0 0 30px;width:30px;height:30px;border-radius:9px;background-color:#8491a3;mask:center/18px no-repeat;-webkit-mask:center/18px no-repeat}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item a:before {content:"";display:block;flex:0 0 30px;width:30px;height:30px;border-radius:9px;background-color:#8491a3;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='M8 8h8M8 12h8M8 16h5'/%3E%3C/svg%3E") center/18px no-repeat;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3' width='16' height='18' rx='2'/%3E%3Cpath d='M8 8h8M8 12h8M8 16h5'/%3E%3C/svg%3E") center/18px no-repeat}
 html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item-selected a:before {background-color:#2878ff}
 html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu:nth-of-type(1) .ant-menu-item:nth-of-type(1) a:before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v16H4zM8 3v4M16 3v4M4 10h16M8 14h3M8 18h7'/%3E%3C/svg%3E");-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v16H4zM8 3v4M16 3v4M4 10h16M8 14h3M8 18h7'/%3E%3C/svg%3E")}
 html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu:nth-of-type(1) .ant-menu-item:nth-of-type(2) a:before {mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='17' rx='2'/%3E%3Cpath d='M8 2v4M16 2v4M4 9h16M8 13h3M8 17h7'/%3E%3C/svg%3E");-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='17' rx='2'/%3E%3Cpath d='M8 2v4M16 2v4M4 9h16M8 13h3M8 17h7'/%3E%3C/svg%3E")}
@@ -63,9 +63,9 @@ html[data-bw-ui="true"] .layout-content>.top-desc>.button-content {position:stat
 [data-bw-workspace] .bill-audit .activeAuditDiv,[data-bw-workspace] .bill-audit .audit-result {height:auto!important;max-height:none!important;overflow:visible!important}
 [data-bw-workspace] .bill-audit .ant-tabs-content {height:auto!important}
 [data-bw-workspace] .collapse-box {width:100%!important;min-width:0!important;margin:0 0 16px!important;border:1px solid var(--bw-line)!important;border-radius:var(--bw-radius)!important;box-shadow:none!important;background:var(--bw-surface);scroll-margin-top:72px}
-[data-bw-workspace] .collapse-box>.ant-collapse-item>.ant-collapse-header[data-bw-heading] {font-size:0!important;display:flex!important;align-items:center;flex-wrap:wrap;gap:12px!important;padding:16px 20px!important;min-height:68px!important;height:auto!important;line-height:0!important;color:transparent!important}
-[data-bw-heading]>.ant-collapse-arrow {display:none!important}
-[data-bw-native-title] {display:none!important}
+[data-bw-workspace] .collapse-box>.ant-collapse-item>.ant-collapse-header[data-bw-heading][data-bw-ready="true"] {font-size:0!important;display:flex!important;align-items:center;flex-wrap:wrap;gap:12px!important;padding:16px 20px!important;min-height:68px!important;height:auto!important;line-height:0!important;color:transparent!important}
+[data-bw-heading][data-bw-ready="true"]>.ant-collapse-arrow {display:none!important}
+[data-bw-ready="true"]>[data-bw-native-title] {display:none!important}
 .bw-heading-host {flex:1 1 200px;min-width:0}
 .bw-heading {display:flex;align-items:center;justify-content:space-between;gap:16px;color:var(--bw-ink);font:16px/1.5 var(--bw-font)}
 .bw-heading-toggle {display:flex;align-items:center;gap:10px;min-width:0;min-height:36px;border:0;padding:0;color:inherit;background:none;font:inherit;cursor:pointer;text-align:left}
@@ -73,8 +73,8 @@ html[data-bw-ui="true"] .layout-content>.top-desc>.button-content {position:stat
 .bw-heading svg {width:18px;height:18px;flex:none;color:var(--bw-muted)}
 .bw-chevron-open {transform:rotate(180deg)}
 .bw-section-amount {flex:none;font-size:21px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.5}
-[data-bw-heading]>.ant-collapse-extra {color:var(--bw-ink)!important;font:15px/1.5 var(--bw-font)!important;display:flex!important;flex-wrap:wrap;gap:8px;max-width:100%;margin:0!important}
-[data-bw-heading]>.ant-collapse-extra .behaviorNum,[data-bw-heading]>.ant-collapse-extra .behaviorName {display:none!important}
+[data-bw-heading][data-bw-ready="true"]>.ant-collapse-extra {color:var(--bw-ink)!important;font:15px/1.5 var(--bw-font)!important;display:flex!important;flex-wrap:wrap;gap:8px;max-width:100%;margin:0!important}
+[data-bw-heading][data-bw-ready="true"]>.ant-collapse-extra .behaviorNum,[data-bw-heading][data-bw-ready="true"]>.ant-collapse-extra .behaviorName {display:none!important}
 [data-bw-workspace] .collapse-box>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {padding:20px!important;min-width:0}
 .bw-section-nav {display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;padding:12px 0;border-bottom:1px solid var(--bw-line);background:var(--bw-background);font:15px/1.5 var(--bw-font)}
 .bw-section-nav a {padding:9px 12px;border-radius:var(--bw-radius);color:var(--bw-muted);text-decoration:none;min-width:0;overflow-wrap:anywhere}
@@ -133,7 +133,7 @@ html[data-bw-ui="true"] :is(.reimbursementCreate,.ant-modal,.re-invoice-dialog) 
 [data-bw-workspace] .ant-table-tbody>tr>td :is(.table-cell,.ant-select,.ant-calendar-picker,.ant-picker) {width:100%!important;box-sizing:border-box}
 [data-bw-workspace] .ant-table-tbody>tr>td .ant-input-number-input {font:16px/1.5 var(--bw-font)!important;min-height:42px!important;width:100%!important;box-sizing:border-box}
 [data-bw-workspace] td[data-bw-row-controls] {min-width:120px;white-space:nowrap!important}
-[data-bw-native-control] {display:none!important}
+[data-bw-row-ready="true"] [data-bw-native-control] {display:none!important}
 .bw-row-actions {display:inline-flex;align-items:center;gap:6px;min-width:0}
 .bw-row-host {display:inline-block!important}
 .bw-button {border:1px solid var(--bw-line);border-radius:var(--bw-radius);min-height:42px;padding:8px 12px;background:#fff;color:var(--bw-ink);font:500 15px/24px var(--bw-font);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;max-width:100%;touch-action:manipulation}
@@ -170,7 +170,7 @@ html[data-bw-ui="true"][data-re-wallet-picker="true"] :is(.ant-btn,.ant-input,.a
 html[data-bw-ui="true"][data-re-wallet-picker="true"] .ant-btn {min-height:42px;font-size:15px}
 @container(max-width:800px){
  [data-bw-workspace] .collapse-box .ant-form>.ant-row:not(.ant-form-item) {grid-template-columns:minmax(0,1fr)}
- [data-bw-workspace] .collapse-box>.ant-collapse-item>.ant-collapse-header[data-bw-heading] {padding:14px 16px!important}
+ [data-bw-workspace] .collapse-box>.ant-collapse-item>.ant-collapse-header[data-bw-heading][data-bw-ready="true"] {padding:14px 16px!important}
  [data-bw-workspace] .collapse-box>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {padding:16px!important}
  .bw-section-nav {gap:4px;font-size:14px}.bw-section-nav a {padding:8px}
 }
@@ -215,3 +215,62 @@ html[data-bw-ui="true"][data-re-wallet-picker="true"] .ant-btn {min-height:42px;
  html[data-bw-ui="true"] .ant-modal {max-width:calc(100vw - 16px)!important;margin:8px!important}
 }
 @media(prefers-reduced-motion:reduce){.bw-menu,.bw-button {animation:none!important;transition:none!important}}
+
+/* Native reimbursement list: the 24-column fixed widths squeezed filters into
+   each other. Reflow only the identified filter row, preserving its handlers. */
+html[data-bw-ui="true"] .layout-content .ant-row:has(>.ant-col>.btn-content-view){display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(220px,100%),1fr));gap:12px!important;align-items:center;margin:0!important;padding:12px 0 20px}
+html[data-bw-ui="true"] .layout-content .ant-row:has(>.ant-col>.btn-content-view)>.ant-col{width:100%!important;max-width:100%!important;min-width:0!important;flex:none!important;padding:0!important}
+html[data-bw-ui="true"] .layout-content .ant-row:has(>.ant-col>.btn-content-view)>.ant-col:has(>.btn-content-view){grid-column:1/-1}
+html[data-bw-ui="true"] .layout-content .btn-content-view{display:flex!important;flex-wrap:wrap;align-items:center;gap:8px;width:100%;min-width:0;font-size:15px}
+html[data-bw-ui="true"] .layout-content .btn-content-view>.ant-input-affix-wrapper{flex:1 1 260px}
+html[data-bw-ui="true"] .layout-content .ant-row:has(>.ant-col>.btn-content-view) :is(.ant-input-affix-wrapper,.ant-calendar-picker){width:100%!important;min-width:0}
+html[data-bw-ui="true"] .commonTable{min-width:0;max-width:100%;height:auto!important;max-height:none!important;overflow:visible!important}
+html[data-bw-ui="true"] .commonTable .ant-table{font:15px/1.6 var(--bw-font)}
+html[data-bw-ui="true"] .commonTable .ant-table-thead>tr>th{font-size:14px;color:var(--bw-muted);background:#f7f8fa!important;padding-top:14px!important;padding-bottom:14px!important}
+html[data-bw-ui="true"] .commonTable .ant-table-tbody>tr>td{padding-top:16px!important;padding-bottom:16px!important;vertical-align:middle}
+/* Detail mode renders plain paragraphs instead of inputs. Include those values
+   in the type scale, without styling invoice iframe or rich document contents. */
+[data-bw-workspace] .ant-form-item-control-input-content>[isaddattachment]>p{font:16px/1.65 var(--bw-font)!important;color:var(--bw-ink);margin:0;overflow-wrap:anywhere}
+html[data-bw-ui="true"] .multi-tab .ant-tabs-tab{font-size:15px!important;line-height:24px!important;min-height:36px;height:auto!important;display:inline-flex;align-items:center;border-radius:8px!important}
+
+/* Ant Design uses anchor::before as an absolute full-row hit area. Our icon
+   must reset that positioning before participating in the link's flex layout. */
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item>.ant-menu-title-content{flex:1;min-width:0;width:100%;overflow:visible}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item a{width:100%;position:relative;isolation:isolate}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-item a:before{position:static!important;inset:auto!important;transform:none!important;float:none!important;align-self:center;pointer-events:none}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title{padding-right:24px!important}
+html[data-bw-ui="true"] .commonTable a.jumpLine{white-space:nowrap!important;font-variant-numeric:tabular-nums}
+
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title{gap:8px!important}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title:before{flex-basis:24px;width:24px;height:30px;border-radius:0}
+html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title>.ant-menu-title-content{flex:1;min-width:0}
+
+/* One replacement toggle, in normal flow. The old images/footer are hidden
+   only after the new React button commits; native click handlers remain. */
+.bw-sidebar-toggle-host{display:flex;align-items:center;justify-content:flex-end;min-height:52px;padding:0 0 8px;box-sizing:border-box;width:100%;flex:none}
+.bw-sidebar-toggle{width:42px;height:42px;padding:10px;color:var(--bw-muted);background:#fff;border-color:var(--bw-line);border-radius:8px}
+.bw-sidebar-toggle:hover{color:var(--bw-blue);background:#edf4ff;border-color:#bdd3f5}
+.bw-sidebar-toggle svg{width:20px;height:20px;flex:none}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"] [data-bw-sidebar-native="true"]{display:none!important}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed{flex:0 0 72px!important;width:72px!important;min-width:72px!important;max-width:72px!important}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .bw-sidebar-toggle-host{justify-content:center}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-submenu-title{justify-content:center!important;gap:0!important;padding:6px 2px!important;font-size:0!important;line-height:0!important;white-space:nowrap!important}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-submenu-title:before{margin:0 auto!important}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-submenu-title>.ant-menu-title-content{position:absolute;width:1px!important;height:1px;clip-path:inset(50%);overflow:hidden}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed :is(.ant-menu-submenu-arrow,.ant-menu-submenu-title:after){display:none!important}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-item{padding:4px!important}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-item a{justify-content:center!important;gap:0!important;font-size:0!important;line-height:0!important;padding:0!important;white-space:nowrap!important;overflow-wrap:normal!important}
+html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-item a *{font-size:0!important;line-height:0!important}
+
+/* The native list caches a body height calculated from its parent. Once fields
+   reflow, that circular measurement can become zero. Give the scroll body an
+   independent viewport bound so the list stays visible after resize/remount. */
+html[data-bw-ui="true"] .commonTable .ant-table-body{height:auto!important;max-height:clamp(220px,calc(100dvh - 430px),720px)!important;overflow:auto!important}
+html[data-bw-ui="true"] .layout-content .ant-tabs:has(>.ant-tabs-bar .addButton)>.ant-tabs-bar .ant-tabs-tab{font-size:15px!important;line-height:24px!important;min-height:44px;box-sizing:border-box}
+html[data-bw-ui="true"] .layout-content .ant-tabs:has(>.ant-tabs-bar .addButton)>.ant-tabs-bar .ant-tabs-tab:focus-visible{outline:3px solid #9fc3ff;outline-offset:-3px;border-radius:6px}
+
+/* Keep chapter navigation to one scrollable row instead of covering the form
+   with several lines of sticky links at browser zoom. Links retain their native
+   keyboard behavior and the existing preventDefault router protection. */
+.bw-section-nav{flex-wrap:nowrap;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
+.bw-section-nav a{flex:0 0 auto;white-space:nowrap}

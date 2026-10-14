@@ -2,7 +2,7 @@
   'use strict';
   if (location.hostname !== 'wsbx.wbu.edu.cn' || window.__reimbursementEnhancer) return;
   const core = window.ReimbursementEnhancerCore;
-  const status = window.__reimbursementEnhancer = { version: '0.13.1', bankInstances: 0, transferInstances: 0, summaryInstances: 0, compatible: false };
+  const status = window.__reimbursementEnhancer = { version: '0.13.9', bankInstances: 0, transferInstances: 0, summaryInstances: 0, compatible: false };
   let settings = { enabled: true, totals: true, aiGuard: true }, requireModule, vue, controller;
   const definitions = new WeakSet(), instances = new WeakSet(), scannedModules = new WeakSet();
   const stateMarker = Symbol('reimbursement-enhancer');
@@ -116,6 +116,7 @@
       window.ReimbursementBasicBridge?.register(instance);
       window.ReimbursementExpenseTools?.mount(instance,controller.form,settings);
       window.ReimbursementInvoiceTools?.register(instance);
+      window.ReimbursementFillCompat?.register(instance);
     }
     for (const key of ['children','dynamicChildren','ssContent','ssFallback','activeBranch','pendingBranch']) walk(node[key], visited);
     if (node.suspense) { walk(node.suspense.activeBranch, visited); walk(node.suspense.pendingBranch, visited); }
@@ -155,6 +156,7 @@
     if (typeof vue.reactive !== 'function' || typeof vue.computed !== 'function') { vue = null; return false; }
     settings = vue.reactive(settings);
     controller = vue.reactive(requireModule('d3ae').a); status.compatible = true;
+    window.ReimbursementFillCompat?.bind({form:()=>controller.form,enabled:()=>settings.enabled&&settings.totals,nextTick:vue.nextTick,refresh:tick,http:requireModule('d354')?.a,bills:()=>window.ReimbursementInvoiceTools?.readBills?.()||[],readDraft:id=>requireModule('351f').o({id}),readAudit:id=>requireModule('351f').k({reimbId:id})});
     window.ReimbursementInvoiceTools?.bind({
       form:()=>controller.form, settings, raw:vue.toRaw, nextTick:vue.nextTick, watch:vue.watch, refresh:tick,
       compute(form){

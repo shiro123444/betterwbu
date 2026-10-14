@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "报销系统交互优化",
-  "version": "0.13.5",
+  "version": "0.13.15",
   "minimum_chrome_version": "111",
   "description": "改善报销布局与发票加载，预览生成费用明细，复用收款资料并同步金额。",
   "permissions": [
@@ -35,6 +35,8 @@
         "invoice-associations.js",
         "invoice-core.js",
         "invoices.js",
+        "fill-compat-core.js",
+        "fill-compat.js",
         "enhance.js"
       ],
       "world": "MAIN",
@@ -53,6 +55,7 @@
         "memory.js",
         "basic-ui-http.js",
         "manager-theme.js",
+        "fill-compat-ui.js",
         "memory-manager.js",
         "actions.js",
         "polish.js",
@@ -86,6 +89,7 @@
       "css": [
         "polish.css",
         "workspace.css",
+        "components.css",
         "wallet-recognition.css"
       ],
       "all_frames": true,

@@ -24,6 +24,7 @@
 html[data-bw-ui=true] .re-basic-shortcut{display:flex;flex-wrap:wrap;gap:8px;min-width:0;max-width:100%;margin-right:0}
 @container(max-width:480px){.re-basic-choice{flex-basis:100%;min-width:0;width:100%}}
 [data-bw-feedback=true]{display:none!important}
+[data-re-native-label=true]{display:none!important}
 html[data-bw-ui=true] .ant-modal-header{padding:20px 24px!important;border-radius:8px 8px 0 0!important}
 html[data-bw-ui=true] .ant-modal-title{font-size:20px!important;line-height:1.5!important;font-weight:600}
 html[data-bw-ui=true] .ant-modal .ant-form-item{margin-bottom:20px!important;display:flex!important;flex-direction:column!important;min-width:0}
@@ -51,3 +52,92 @@ html[data-bw-motion=false] :is(.bw-choice-popup,.bw-menu,.bw-sidebar,.bw-detail-
 @media(max-width:600px){.bw-dialog-heading{padding:16px}.bw-detail-dialog{width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}}
 @media(prefers-reduced-motion:reduce){.bw-choice-popup,.bw-menu,.bw-sidebar,.bw-detail-dialog,.bw-dialog-backdrop,.bw-toast{transition:none!important;animation:none!important}}
 @media(prefers-reduced-motion:reduce){html[data-bw-ui=true] .ant-modal-content{animation:none!important}}
+
+/* Native Vue fields retain their validation and IDs. Cover both Ant Design
+   generations with the same surface as the Base UI controls above. */
+html[data-bw-ui=true]{--bw-field-height:44px;--bw-field-border:#d8dee7;--bw-field-muted:#687385;--bw-field-focus:#2878ff}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-input,.ant-select-selection,.ant-select-selector,.ant-input-number,.ant-picker,.ant-input-affix-wrapper){
+ box-sizing:border-box!important;min-width:0;max-width:100%;min-height:var(--bw-field-height)!important;border:1px solid var(--bw-field-border)!important;border-radius:8px!important;background:#fff!important;color:#252d3a!important;font:16px/1.5 var(--bw-font,system-ui,-apple-system,"Microsoft YaHei",sans-serif)!important;box-shadow:none!important;transition:border-color 120ms ease,background-color 120ms ease!important;
+}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) input.ant-input{height:var(--bw-field-height)!important;padding:9px 12px!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) textarea.ant-input{padding:10px 12px!important;min-height:96px!important;resize:vertical}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-input,.ant-select-selection,.ant-select-selector,.ant-input-number,.ant-picker,.ant-input-affix-wrapper):hover{border-color:#a7b9d0!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-input:focus-visible,.ant-select-selection:focus-visible,.ant-select-selector:focus-visible,.ant-select-focused .ant-select-selection,.ant-select-focused .ant-select-selector,.ant-input-number:focus-within,.ant-picker:focus-within,.ant-input-affix-wrapper:focus-within){border-color:var(--bw-field-focus)!important;outline:3px solid #9fc3ff!important;outline-offset:2px}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-select-selection__placeholder,.ant-select-selection-placeholder){color:#8b94a2!important;font-size:15px!important}
+/* v2 selectors have an extra rendered wrapper; v4 uses .ant-select-selector. */
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select{min-width:0;max-width:100%;font:inherit}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-selection--single{height:var(--bw-field-height)!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-selection__rendered{margin:0 12px!important;line-height:42px!important;min-height:42px;min-width:0}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-selection-selected-value{max-width:100%;padding-right:24px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px!important;line-height:42px!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-selection__placeholder{max-width:calc(100% - 24px);line-height:24px!important;height:24px!important;margin-top:-12px!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-search__field{font:inherit!important;line-height:42px!important;height:42px!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-select-arrow,.ant-select-clear){right:12px!important;font-size:13px!important;color:var(--bw-field-muted)}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-selection--multiple{padding:4px 0!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-selection--multiple .ant-select-selection__rendered{line-height:30px!important;min-height:34px}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-selection--multiple .ant-select-selection__choice{height:auto!important;line-height:26px!important;margin:3px 6px 3px 0!important;border:0!important;border-radius:5px!important;background:#edf4ff!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-single .ant-select-selector{display:flex;align-items:center;height:var(--bw-field-height)!important;padding:0 12px!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-select-selection-item,.ant-select-selection-placeholder){line-height:24px!important;font-size:16px!important}
+/* Only the outer control owns a border. Nested search/date/affix inputs do not. */
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-select-selector,.ant-picker,.ant-input-affix-wrapper)>input.ant-input,
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-select-selection input.ant-input{border:0!important;border-radius:0!important;outline:none!important;box-shadow:none!important;background:transparent!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-calendar-picker{display:inline-block;min-width:0;max-width:100%;font:16px/1.5 var(--bw-font,system-ui)}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-calendar-picker-input{padding-right:36px!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-calendar-picker-icon,.ant-calendar-picker-clear){right:12px!important;color:var(--bw-field-muted)}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-input-number{height:var(--bw-field-height)!important;padding:0!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-input-number-input{box-sizing:border-box;height:42px!important;min-height:0!important;padding:9px 30px 9px 12px!important;color:inherit!important;font:inherit!important;font-variant-numeric:tabular-nums}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) .ant-input-number-handler-wrap{width:24px!important;overflow:hidden;border-radius:0 7px 7px 0!important;border-left:1px solid #e2e6ec!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal,.re-invoice-dialog) :is(.ant-input[disabled],.ant-select-disabled .ant-select-selection,.ant-select-disabled .ant-select-selector,.ant-input-number-disabled,.ant-picker-disabled){background:#f7f8fa!important;border-color:#e2e6ec!important;color:var(--bw-field-muted)!important;cursor:default;outline:none!important}
+/* Popup surfaces live under body, outside the form's React-owned portals. */
+html[data-bw-ui=true] :is(.ant-select-dropdown,.ant-calendar,.ant-picker-panel-container,.ant-dropdown-menu){border:1px solid #e2e6ec!important;border-radius:8px!important;padding:6px!important;box-shadow:0 6px 24px #252d3a18!important;color:#252d3a!important;font:15px/1.5 var(--bw-font,system-ui)!important}
+html[data-bw-ui=true] :is(.ant-select-dropdown-menu-item,.ant-select-item-option,.ant-dropdown-menu-item){min-height:42px!important;padding:9px 12px!important;border-radius:6px!important;font-size:15px!important;line-height:24px!important;white-space:normal!important;overflow-wrap:anywhere}
+html[data-bw-ui=true] :is(.ant-select-dropdown-menu-item-active,.ant-select-item-option-active,.ant-dropdown-menu-item-active){background:#edf4ff!important;color:#1765e8!important}
+html[data-bw-ui=true] :is(.ant-select-dropdown-menu-item-selected,.ant-select-item-option-selected){background:#edf4ff!important;font-weight:500!important}
+html[data-bw-ui=true] :is(.ant-select-dropdown-menu-item-disabled,.ant-select-item-option-disabled,.ant-dropdown-menu-item-disabled){color:#8b94a2!important;background:transparent!important}
+html[data-bw-ui=true] .ant-calendar-input{height:36px!important;font:15px/1.5 var(--bw-font,system-ui)!important}
+html[data-bw-ui=true] .ant-modal-confirm .ant-modal-body{padding:24px!important}
+html[data-bw-ui=true] .ant-modal-confirm-title{font-size:20px!important;line-height:1.5!important;color:#252d3a!important}
+html[data-bw-ui=true] .ant-modal-confirm-content{font-size:16px!important;line-height:1.65!important;color:#687385!important;overflow-wrap:anywhere}
+html[data-bw-ui=true] .ant-modal-confirm-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:24px!important}
+html[data-bw-ui=true] .ant-modal-confirm-btns>.ant-btn{margin:0!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal) :is(.ant-checkbox-wrapper,.ant-radio-wrapper){font:15px/1.5 var(--bw-font,system-ui)!important;color:#252d3a;white-space:normal}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal) :is(.ant-checkbox-inner,.ant-radio-inner){width:18px!important;height:18px!important;border-color:#b9c3d1!important;background:#fff}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal) .ant-checkbox-inner{border-radius:4px!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal) .ant-checkbox-checked .ant-checkbox-inner{border-color:#2878ff!important;background:#2878ff!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal) .ant-radio-checked .ant-radio-inner{border-color:#2878ff!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal) .ant-radio-inner:after{background:#2878ff!important}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal) :is(.ant-checkbox-input,.ant-radio-input):focus-visible+span{outline:3px solid #9fc3ff!important;outline-offset:2px}
+html[data-bw-ui=true] :where(.layout-content,.reimbursementCreate,.file-page,.ant-modal) :is(.ant-checkbox-disabled,.ant-radio-disabled) :is(.ant-checkbox-inner,.ant-radio-inner){background:#f7f8fa!important;border-color:#d8dee7!important}
+/* Some native form types have no named container; keep the narrow fallback. */
+@media(max-width:800px){[data-bw-workspace] .collapse-box .ant-form>.ant-row:not(.ant-form-item){grid-template-columns:minmax(0,1fr)!important}}
+@media(prefers-reduced-motion:reduce){html[data-bw-ui=true] :is(.ant-input,.ant-select-selection,.ant-select-selector,.ant-input-number,.ant-picker,.ant-input-affix-wrapper){transition:none!important}}
+
+/* List/search shells use the same fields without remounting native controls. */
+html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) .ant-input::placeholder{color:#8b94a2!important;font-size:15px!important}
+html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) .ant-input-affix-wrapper{display:inline-flex!important;align-items:center;padding:0 12px!important;gap:8px}
+html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) .ant-input-affix-wrapper>input.ant-input{width:100%;flex:1;min-width:0;min-height:42px!important;height:42px!important;padding:9px 0!important}
+html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) .ant-input-affix-wrapper>.ant-input-suffix{position:static!important;transform:none!important;flex:none;line-height:24px}
+/* Keep the fixed action column compact; avoid stacking unrelated button styles. */
+html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) button.ant-btn{min-height:42px;height:auto;border-radius:8px;font:500 15px/24px var(--bw-font,system-ui);box-shadow:none}
+html[data-bw-ui=true] .commonTable td>button.ant-btn{display:inline-flex!important;align-items:center;justify-content:center;gap:5px!important;min-height:40px!important;padding:7px 4px!important;margin:0 4px 0 0!important;font-size:14px!important;line-height:24px!important;border-color:transparent!important;background:transparent!important;color:#1765e8!important;white-space:nowrap!important}
+html[data-bw-ui=true] .commonTable td>button.ant-btn:last-child{margin-right:0!important}
+html[data-bw-ui=true] .commonTable td>button.ant-btn svg[data-re-action-icon]{width:16px!important;height:16px!important;flex-basis:16px!important}
+html[data-bw-ui=true] .commonTable td>button.ant-btn:hover{background:#edf4ff!important}
+html[data-bw-ui=true] .commonTable td>button.ant-btn-dangerous{color:#b83434!important}
+html[data-bw-ui=true] .commonTable td>button.ant-btn-dangerous:hover{background:#fff0ef!important}
+html[data-bw-ui=true] button.ant-btn:focus-visible{outline:3px solid #9fc3ff!important;outline-offset:2px}
+html[data-bw-ui=true] button.ant-btn:disabled{cursor:default}
+/* One pagination scale for lists, detail tables and the invoice wallet. */
+html[data-bw-ui=true] .ant-pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:16px 0!important;line-height:40px;font:15px/40px var(--bw-font,system-ui)}
+html[data-bw-ui=true] .ant-pagination :is(.ant-pagination-item,.ant-pagination-prev,.ant-pagination-next){min-width:40px;height:40px!important;line-height:38px!important;border:1px solid #e2e6ec;border-radius:8px;margin:0!important;background:#fff}
+html[data-bw-ui=true] .ant-pagination :is(.ant-pagination-item a,.ant-pagination-item-link){display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:15px;border:0!important;border-radius:8px;background:transparent}
+html[data-bw-ui=true] .ant-pagination .ant-pagination-item-active{border-color:#2878ff;background:#edf4ff}
+html[data-bw-ui=true] .ant-pagination .ant-pagination-item-active a{color:#1765e8;font-weight:600}
+html[data-bw-ui=true] .ant-pagination :is(.ant-pagination-item,.ant-pagination-prev,.ant-pagination-next):focus-visible{outline:3px solid #9fc3ff;outline-offset:2px}
+html[data-bw-ui=true] .ant-pagination .ant-pagination-disabled{opacity:.45;cursor:default}
+html[data-bw-ui=true] .ant-pagination :is(.ant-pagination-options,.ant-pagination-total-text){margin:0!important;height:auto!important}
+html[data-bw-ui=true] .ant-pagination .ant-select{min-width:112px}
+
+/* Native error states must stay visible above the shared neutral field border. */
+html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) :is(.ant-form-item-has-error,.has-error) :is(.ant-input,.ant-input-affix-wrapper,.ant-select-selection,.ant-select-selector,.ant-input-number,.ant-picker),
+html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) :is(.ant-input-status-error,.ant-input-affix-wrapper-status-error,.ant-select-status-error .ant-select-selector,.ant-input-number-status-error,.ant-picker-status-error){border-color:#c53c3c!important}
+html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) :is(.ant-form-item-has-error,.has-error) .ant-input-affix-wrapper>input.ant-input{border:0!important}

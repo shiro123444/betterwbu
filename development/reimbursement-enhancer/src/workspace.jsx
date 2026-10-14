@@ -1,9 +1,10 @@
-import React, {useSyncExternalStore, useState} from 'react';
+import React, {useSyncExternalStore, useState, useLayoutEffect} from 'react';
 import {createRoot} from 'react-dom/client';
 import {createPortal} from 'react-dom';
 import {Menu} from '@base-ui/react/menu';
 import './ui-runtime.jsx';
 import {createWorkspaceModel} from './workspace-model.cjs';
+import {createSidebarToggle} from './sidebar-toggle.jsx';
 
 const paths = {
   chevron:'m6 9 6 6 6-6', more:'M5 12h.01M12 12h.01M19 12h.01',
@@ -14,6 +15,7 @@ function Icon({name, ...props}) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}><path d={paths[name]}/></svg>;
 }
 function Heading({section, model}) {
+  useLayoutEffect(()=>{model.presentHeader(section);return()=>section.header.removeAttribute('data-bw-ready')},[section.header,model]);
   return <div className="bw-heading">
     <h2><button type="button" className="bw-heading-toggle" aria-expanded={section.expanded}
       onClick={event=>{event.stopPropagation();model.invoke(section.header)}}>
@@ -23,6 +25,7 @@ function Heading({section, model}) {
   </div>;
 }
 function RowActions({row, model}) {
+  useLayoutEffect(()=>{row.cell.dataset.bwRowReady='true';return()=>row.cell.removeAttribute('data-bw-row-ready')},[row.cell,row.id]);
   return <div className="bw-row-actions" onClick={event=>event.stopPropagation()}>
     <button type="button" className="bw-button bw-button-quiet" disabled={row.disabled}
       onClick={()=>model.invoke(row.detail)}>详情</button>
@@ -52,6 +55,7 @@ function Workspace({model}) {
 const marker=Symbol.for('betterwbu.react-workspace');
 if(!document[marker]) {
   const model=createWorkspaceModel(document);
+  const sidebar=createSidebarToggle(document);
   let reactRoot, mount, navigation, nativeRoot, frame, stopped=false;
   function tick(){
     frame=null;if(stopped)return;
@@ -68,9 +72,9 @@ if(!document[marker]) {
   const observer=new MutationObserver(records=>{
     if(records.some(r=>!r.target.closest?.('[data-bw-owned]') || r.type==='attributes'))schedule();
   });
-  async function configure(){try{const s=await chrome.storage.local.get({enabled:true,visual:true});model.enable(s.enabled&&s.visual);schedule()}catch{model.enable(false);schedule()}}
-  function start(){observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','aria-expanded','aria-disabled','disabled','data-re-visual']});configure();schedule()}
-  document[marker]={model,refresh:tick,destroy(){stopped=true;observer.disconnect();if(frame)cancelAnimationFrame(frame);reactRoot?.unmount();mount?.remove();navigation?.remove();model.destroy()}};
+  async function configure(){try{const s=await chrome.storage.local.get({enabled:true,visual:true});model.enable(s.enabled&&s.visual);sidebar.enable(s.enabled&&s.visual);schedule()}catch{model.enable(false);sidebar.enable(false);schedule()}}
+  function start(){observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','aria-expanded','aria-disabled','disabled','data-re-visual']});sidebar.start();configure();schedule()}
+  document[marker]={model,refresh:tick,destroy(){stopped=true;observer.disconnect();if(frame)cancelAnimationFrame(frame);reactRoot?.unmount();mount?.remove();navigation?.remove();sidebar.destroy();model.destroy()}};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   chrome.storage.onChanged.addListener(configure);window.addEventListener('hashchange',schedule);
 }

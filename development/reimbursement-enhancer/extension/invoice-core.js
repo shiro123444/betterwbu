@@ -15,7 +15,7 @@
   function amount(value) { if (value == null || String(value).trim() === '') return null; try { return money.cents(String(value).replace(/[−－]/g,'-')); } catch { return null; } }
   function classify(bill, available) {
     const d = bill.billData || {}, names = new Set();
-    const text = [bill.ticketName, d.templateGroupName, d.business, ...(d.details || []).map(x => x.content)].filter(v => typeof v === 'string').join(' ');
+    const text = [bill.ticketName || d.billTitle || bill.billTitle, d.templateGroupName, d.business, ...(d.details || []).map(x => x.content)].filter(v => typeof v === 'string').join(' ');
     // Product names such as "国内机票航空意外险" describe insurance, not a flight fare.
     // Keep unrelated fare lines and an actual ticket title available for mixed invoices.
     const transportText = text.replace(/(?:国内)?机票航空意外险|航空(?:旅客)?意外险|交通意外险|交通保险/g, '');
@@ -46,16 +46,17 @@
         if (children?.length) { containerCount++; visit(children,depth+1); continue; }
         const key = identity(bill), cents = amount(bill.totalAmount ?? bill.billData?.totalAmount);
         if (key && seenIds.has(key)) { duplicateCount++; continue; } if (key) seenIds.add(key);
-        const label = String(bill.ticketName || bill.billData?.templateGroupName || '');
+        const label = String(bill.ticketName || bill.billData?.billTitle || bill.billTitle || bill.billData?.templateGroupName || '');
         const supporting = /情况说明|通知|申请表|合同|流水单|截图/.test(label) || String(bill.fileType) === '1';
         const container = String(bill.dataType) === '5';
         const currency = bill.billData?.currency || bill.billData?.currencyCode;
         const foreign = currency && !['CNY','RMB','人民币','元','156'].includes(String(currency));
         const classified = classify(bill,available);
         const recognized = /发票|客票|行程单|通行费|收费票据|财政票据/.test(label) && !/截图/.test(label);
-        const blocked = !!(supporting || container || !key || foreign || cents == null || cents <= 0 || !recognized);
-        let reason = supporting ? '辅助材料，不计入费用' : container ? '票夹明细尚未展开，请重新加载票据' : !key ? '缺少票据标识，无法防止重复导入' : foreign ? '外币票据需要确认汇率和本币金额' : cents == null ? '没有有效金额，请核对票据识别结果' : cents === 0 ? '金额为零，不生成费用' : cents < 0 ? '红字或退款票据需单独核对，不纳入本次发票合计' : !recognized ? '未识别为发票或客票，不计入费用' : classified.reason;
-        rows.push({identity:key, title:String(bill.billTitle || bill.ticketName || bill.fileName || '未命名票据'), amountCents:cents, category:classified.category, reason, blocked, countable:!blocked, selected:!blocked && recognized && !!classified.category && !classified.reason, bill});
+        const detailPending=!!(!supporting&&recognized&&!bill.billData);
+        const blocked = !!(supporting || container || !key || foreign || cents == null || cents <= 0 || !recognized || detailPending);
+        let reason = supporting ? '辅助材料，不计入费用' : container ? '票夹明细尚未展开，请重新加载票据' : !key ? '缺少票据标识，无法防止重复导入' : foreign ? '外币票据需要确认汇率和本币金额' : cents == null ? '没有有效金额，请核对票据识别结果' : cents === 0 ? '金额为零，不生成费用' : cents < 0 ? '红字或退款票据需单独核对，不纳入本次发票合计' : !recognized ? '未识别为发票或客票，不计入费用' : detailPending ? '票据识别详情尚未加载，请刷新票据' : classified.reason;
+        rows.push({identity:key, title:String(bill.billTitle || bill.ticketName || bill.fileName || '未命名票据'), amountCents:cents, category:classified.category, reason, detailPending, blocked, countable:!blocked, selected:!blocked && recognized && !!classified.category && !classified.reason, bill});
       }
     }
     visit(selected);

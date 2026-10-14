@@ -40,7 +40,10 @@
     // invoice line. A barcode and useAmount alone do not resolve invoice content.
     const models=['air','hotel'].filter(key=>Array.isArray(data[key])&&data[key].length);
     if(models.length>1)throw Error('票据明细来源不明确，请核对识别结果');
-    const model=text(metadata.model)||models[0]||(Array.isArray(data.details)&&data.details.length?'details':'');
+    // An ordinary VAT service invoice can also contain zero-valued passenger
+    // records under air. Those are itinerary context, not its priced line.
+    const ordinaryDetails=ticketCode==='1-024'&&!data.hotel?.length&&Array.isArray(data.details)&&data.details.length;
+    const model=text(metadata.model)||(ordinaryDetails?'details':models[0])||(Array.isArray(data.details)&&data.details.length?'details':'');
     if(model&&(!['details','air','hotel','train'].includes(model)||!Array.isArray(data[model])||!data[model].length))throw Error('原票据明细来源已变化，请刷新票据');
     if(total<=0)throw Error('没有可关联的有效发票金额');
     if(data.totalAmount!=null&&text(data.totalAmount)!==''&&cents(data.totalAmount)!==total)throw Error('票面金额与识别详情不一致，请刷新票据');
@@ -65,7 +68,7 @@
   }
   function allocations(row){
     const list=row.allocations||[{person:text(row.bill?.billData?.name),amountCents:row.amountCents}];
-    if(!Array.isArray(list)||!list.length||list.length>60)throw Error('请核对发票分摊');
+    if(!Array.isArray(list)||!list.length||list.length>60)throw Error('请点击按人均分，或填写有效的分摊金额');
     const seen=new Set();
     for(const a of list){const person=text(a.person);if(['交通意外险','住宿'].includes(row.category)&&!person)throw Error('请填写'+row.category+'费用归属人员');if(person.length>80||/[\u0000-\u001f]/.test(person))throw Error('费用归属人员无效');if(seen.has(person))throw Error('同一发票分摊人员不能重复');seen.add(person);if(!Number.isSafeInteger(a.amountCents)||a.amountCents<=0)throw Error('分摊金额须大于零，且精确到分')}
     if(sum(list.map(a=>a.amountCents))!==row.amountCents)throw Error('分摊合计必须等于所选发票金额');

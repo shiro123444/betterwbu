@@ -6,6 +6,17 @@ function bill(id,total='120',category='insurance'){
   billData:{invoiceNO:'invoice-'+id,totalTax:'6.79',details:[{inx:'0',content:category==='insurance'?'航空意外险':'住宿费',amount:String(Number(total)-6.79),taxAmount:'6.79'}]}};
 }
 const names=['测试甲','测试乙','测试丙'];
+
+test('ordinary service invoices use financial details rather than auxiliary passenger air records',()=>{
+ const b=bill('ancillary','112.98');
+ b.billData.totalAmount='112.98';b.billData.totalTax='6.40';
+ b.billData.details=[{inx:'0',content:'代订附加产品',amount:'106.58',taxAmount:'6.40'}];
+ b.billData.air=[{inx:'0',transportation:'飞机',taxAmount:'6.40'},...names.map((name,i)=>({inx:String(i+1),payingCorp:name,amount:'0',totalAmount:'0',taxAmount:'0'}))];
+ const r=rows([b])[0];r.category='其他';r.selected=true;r.allocations=invoices.associations.evenSplit(11298,names);
+ const generated=invoices.associations.compile([r]);
+ assert.deepEqual(generated.map(r=>r.amountCents),[3766,3766,3766]);
+ assert.ok(generated.every(r=>r.links[0].BSX070808==='details'));
+});
 test('two 120 insurance invoices allocate to three 80 expenses with two real 40 links per person',()=>{
  const p=rows([bill('out'),bill('back')]);
  for(const r of p)r.allocations=names.map(person=>({person,amountCents:4000}));

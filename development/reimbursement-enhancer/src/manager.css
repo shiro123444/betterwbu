@@ -42,6 +42,7 @@ input[type="checkbox"]{width:18px;height:18px;flex:0 0 18px;margin:0;accent-colo
 .bank-option{display:block;width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere;line-height:1.6;border:0;border-bottom:1px solid var(--bw-line);border-radius:0;padding:12px}
 .bank-option:hover,.bank-option[aria-selected="true"]{background:#edf4ff;color:#1765e8}.more{width:100%}
 .group{margin:0;padding:0;border:0}.settings-group{margin:24px 0 0;padding:0;border:0;min-width:0}.settings-group legend{font-size:14px;color:var(--bw-muted);font-weight:600;padding:0 0 8px}
+.fill-compat-report p{margin:12px 0;overflow-wrap:anywhere}.fill-compat-report .fill-compat-issue{color:#b42318;border-left:3px solid #b42318;padding-left:12px}
 .label{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0;padding:14px 0;border-bottom:1px solid #eef0f4;line-height:1.6;font-size:15px}
 .label input{order:2}.label span{order:1;min-width:0}.label:first-child{padding-top:0}
 .notice{flex:none;font-size:14px;line-height:1.6;color:var(--bw-muted);padding:12px 24px;border-top:1px solid var(--bw-line);overflow-wrap:anywhere}.notice:empty{display:none}

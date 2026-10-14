@@ -27,4 +27,7 @@
   publish();
   document.addEventListener('DOMContentLoaded', publish, { once: true });
   setInterval(buttons, 500);
+  // MV3 may suspend the worker and discard a temporary fill lease. Reconcile
+  // the original guard even if its worker timer did not survive suspension.
+  setInterval(()=>chrome.runtime.sendMessage({type:'configure-guard'}).catch(()=>{}),10000);
 })();

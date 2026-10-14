@@ -117,6 +117,38 @@ test('explicit people do not inherit another default actor ID',async()=>{
  const rows=f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='交通意外险').behaviorDetail;
  assert.equal(rows[0].BSX070108,'synthetic-actor-a');assert.equal(rows[1].BSX070108,'');assert.equal(rows[2].BSX070108,'');assert.deepEqual(Array.from(rows,r=>r.BSX070109),['测试甲','测试乙','测试丙']);
 });
+
+test('re-entering the same split names with another delimiter retains confirmed allocation',()=>{
+ const f=fixture({ui:true});f.form.billVOList=[insuranceBill('split-out','去程保险')];
+ f.api.mount();f.document.button('从票据生成明细').fire('click');
+ const names=f.document.control('归属人员：去程保险');names.value='测试甲，测试乙，测试丙';names.fire('input');
+ assert.equal(f.document.button('更新费用明细').disabled,true);
+ f.document.control('按人均分：去程保险').fire('click');
+ assert.equal(f.document.button('更新费用明细').disabled,false);
+ names.value=' 测试甲, 测试乙, 测试丙 ';names.fire('input');
+ assert.equal(f.document.button('更新费用明细').disabled,false);
+ assert.deepEqual(f.document.dialog().querySelectorAll('.re-invoice-allocation-grid').flatMap(g=>g.querySelectorAll('input')).map(n=>n.value),['40.00','40.00','40.00']);
+ names.value='测试甲,测试乙';names.fire('input');
+ assert.equal(f.document.button('更新费用明细').disabled,true);
+});
+
+test('two reissued ancillary invoices can be explicitly classified and split without losing a cent',async()=>{
+ const f=fixture({ui:true});const template=f.main.setupState.activityOptionList[0];
+ template.behaviors.push({...structuredClone(template.behaviors[0]),behaviorMetaName:'其他',behaviorMetaId:'other'});
+ f.form.billVOList=[['out','112.98','106.58','6.40'],['back','135.99','128.29','7.70']].map(([id,total,net,tax])=>nativeBill({barcode:id,billTitle:id,totalAmount:total,ticketName:'电子发票（普通发票）',billData:{invoiceNO:'invoice-'+id,totalAmount:total,totalTax:tax,details:[{inx:'0',content:'代订附加产品',amount:net,taxAmount:tax}]}}));
+ f.api.mount();f.document.button('从票据生成明细').fire('click');
+ for(const id of ['out','back']){
+  const category=f.document.control('费用分类：'+id);category.value='其他';category.fire('change');
+  const names=f.document.control('归属人员：'+id);names.value='测试甲，测试乙，测试丙';names.fire('input');
+  f.document.control('按人均分：'+id).fire('click');
+ }
+ assert.equal(f.document.button('更新费用明细').disabled,false);
+ f.document.button('更新费用明细').fire('click');await settle();
+ const records=f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='其他').behaviorDetail;
+ assert.equal(records.length,6);assert.equal(f.form.totalAmount,'248.97');
+ assert.deepEqual(Array.from(records,r=>r.BSX070306),[37.66,37.66,37.66,45.33,45.33,45.33]);
+ assert.ok(records.every(r=>r.BSX0709[0].BSX070808==='details'));
+});
 test('insurance native rows serialize actual invoice relationships, not only explanatory text',async()=>{
  const f=fixture();f.form.billVOList=[insuranceBill('out','去程保险'),insuranceBill('back','返程保险')];const p=f.api.prepare();
  for(const r of p.rows)r.allocations=invoices.associations.evenSplit(12000,['测试甲','测试乙','测试丙']);

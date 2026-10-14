@@ -76,7 +76,7 @@
           const old = choices.get(row.identity);
           if (!old || row.blocked || old.amountCents !== row.amountCents) continue;
           row.allocations=old.allocations?.map(a=>({...a}));row.supportIdentities=old.supportIdentities?.slice();row.allocationPeople=old.allocationPeople;
-          if (!old.category || next.available.includes(old.category)) row.category = old.category;
+          if (!old.category || next.available.includes(old.category)) {row.category = old.category;if(row.category)row.reason='';}
           row.selected = old.selected && !!row.category; row.touched = true;
         }
       }
@@ -309,7 +309,13 @@
       const name=el('label',a.person),money=el('input');money.type='text';money.inputMode='decimal';money.value=(a.amountCents/100).toFixed(2);money.setAttribute('aria-label','分摊金额：'+row.title+'：'+a.person);name.append(money);grid.append(name);
       money.addEventListener('input',()=>{row.touched=true;row.allocations[i].amountCents=core.amount(money.value);refresh()});
     }}
-    names.addEventListener('input',()=>{row.touched=true;row.allocationPeople=names.value;row.allocations=[];draw();refresh()});
+    names.addEventListener('input',()=>{
+      row.touched=true;row.allocationPeople=names.value;
+      let samePeople=false;
+      try{const people=core.associations.people(names.value);samePeople=!!row.allocations?.length&&people.length===row.allocations.length&&people.every((name,i)=>name===row.allocations[i].person)}catch{ /* A changed or incomplete list requires an explicit split. */ }
+      if(!samePeople){row.allocations=[];draw()}
+      refresh();
+    });
     split.addEventListener('click',()=>{row.touched=true;row.allocationPeople=names.value;try{row.allocations=core.associations.evenSplit(row.amountCents,names.value);draw();refresh()}catch(e){row.allocations=[];draw();refresh();tell(e.message)}});draw();
     const supporting=allRows.filter(core.associations.supporting);
     if(supporting.length){const evidence=el('details');evidence.className='re-invoice-supports';evidence.append(el('summary','住宿凭证（不计金额）'));for(const s of supporting){const l=el('label'),n=el('input');n.type='checkbox';n.checked=!!row.supportIdentities?.includes(s.identity);n.setAttribute('aria-label','关联住宿凭证：'+row.title+'：'+s.title);l.append(n,el('span',s.title+' · '+String(s.bill.barcode||'').slice(-4)));evidence.append(l);n.addEventListener('change',()=>{row.touched=true;const chosen=new Set(row.supportIdentities||[]);if(n.checked)chosen.add(s.identity);else chosen.delete(s.identity);row.supportIdentities=[...chosen];refresh()})}box.append(evidence)}
@@ -346,7 +352,7 @@
       if (i.props?.tableRecord?.behaviors && typeof i.setupState?.onAddBehaviorList === 'function') detailInstances.add(i);
     },
     mount() { for (const i of detailInstances) if (!alive(i)) detailInstances.delete(i); mount(); },
-    prepare, apply
+    prepare, apply, readBills:richBills
   };
   window.addEventListener?.('message', event=>{
     if(event.origin !== location.origin)return;

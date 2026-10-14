@@ -4,7 +4,7 @@ class Node{
  get parentNode(){return this.parent}
  append(...nodes){for(const n of nodes){n.parent=this;n.isConnected=this.isConnected;this.children.push(n)}}remove(){this.isConnected=false;if(this.parent)this.parent.children=this.parent.children.filter(n=>n!==this);this.parent=null}
  setAttribute(k,v){this.attrs.set(k,String(v))}getAttribute(k){if(k.startsWith('data-'))return this.dataset[k.slice(5).replace(/-([a-z])/g,(_,x)=>x.toUpperCase())]??null;return this.attrs.get(k)??null}removeAttribute(k){this.attrs.delete(k);if(k.startsWith('data-'))delete this.dataset[k.slice(5).replace(/-([a-z])/g,(_,x)=>x.toUpperCase())]}
- closest(s){if(s==='.table-level2-box')return null;return {querySelector:()=>({childNodes:[{nodeType:3,textContent:'收付款信息'}]})}}querySelectorAll(){return []}click(){this.clicks++}
+ closest(s){if(s==='.table-level2-box'||s.includes('data-bw-'))return null;return {querySelector:()=>({childNodes:[{nodeType:3,textContent:'收付款信息'}]})}}querySelectorAll(){return []}click(){this.clicks++}
 }
 test('action labels preserve the original controls, clarify last-row copy, support keyboard and restore attributes',async()=>{
  const icons=['plus-circle','delete','copy'].map(v=>{const n=new Node('span',true);n.setAttribute('aria-label',v);n.setAttribute('role','img');n.setAttribute('tabindex','-1');return n});let changed,keydown,enabled=true;
@@ -39,4 +39,26 @@ test('rehydration adopts one existing pair, removes stale duplicates and survive
  // An independently initialized modern instance shares existing decoration nodes.
  for(let i=0;i<2;i++){const extraLabel=new Node('span',true),extraIcon=new Node('svg',true);extraLabel.dataset.reActionLabel='true';extraIcon.dataset.reActionIcon='true';f.button.append(extraIcon,extraLabel)}
  assert.equal(f.button.children.length,7);const source=fs.readFileSync(__dirname+'/../extension/actions.js','utf8');delete f.context.document[Symbol.for('reimbursement-enhancer.actions')];vm.runInContext(source,f.context);await new Promise(setImmediate);assert.equal(f.button.children.length,3);
+});
+
+test('plain and nested native button labels render once and restore original text nodes',async()=>{
+ const {JSDOM}=require('jsdom'),dom=new JSDOM('<button class="ant-btn" type="button">查询</button><button class="ant-btn" type="button"><span><span>新增明细</span></span></button>',{runScripts:'outside-only',pretendToBeVisual:true});
+ const w=dom.window,d=w.document;let changed,enabled=true,clicks=0;const button=d.querySelector('button'),text=button.firstChild;
+ button.onclick=()=>clicks++;w.chrome={storage:{local:{get:async x=>({...x,enabled})},onChanged:{addListener:fn=>changed=fn}}};
+ w.eval(fs.readFileSync(__dirname+'/../extension/actions.js','utf8'));await new Promise(r=>setTimeout(r,40));
+ assert.equal(button.querySelector('[data-re-native-label]').firstChild,text);assert.equal(button.querySelectorAll('[data-re-action-label]').length,1);
+ assert.equal(d.querySelectorAll('button')[1].getAttribute('aria-label'),'添加明细');button.click();assert.equal(clicks,1);
+ button.dataset.bwNativeControl='true';button.append(d.createTextNode(''));await new Promise(r=>setTimeout(r,40));
+ assert.equal(button.querySelector('[data-re-action-label]'),null);assert.equal(button.firstChild,text);
+ enabled=false;await changed();assert.equal(button.firstChild,text);assert.equal(clicks,1);w.close();
+});
+
+test('list view, print and audit buttons keep native handlers and disabled state across rescans',async()=>{
+ const {JSDOM}=require('jsdom'),dom=new JSDOM('<div class="commonTable"><button class="ant-btn ant-btn-link"><span>查看</span></button><button class="ant-btn ant-btn-link"><span>打印</span></button><button class="ant-btn" disabled><span>稽核报告</span></button></div>',{runScripts:'outside-only',pretendToBeVisual:true});
+ const w=dom.window,d=w.document,buttons=[...d.querySelectorAll('button')],originals=buttons.map(n=>n.firstChild);let changed,enabled=true;const clicks=[0,0,0];
+ buttons.forEach((n,i)=>n.onclick=()=>clicks[i]++);w.chrome={storage:{local:{get:async x=>({...x,enabled})},onChanged:{addListener:fn=>changed=fn}}};
+ w.eval(fs.readFileSync(__dirname+'/../extension/actions.js','utf8'));await new Promise(r=>setTimeout(r,40));
+ buttons.forEach((n,i)=>{assert.equal(n.getAttribute('aria-label'),['查看','打印','稽核报告'][i]);assert.equal(n.querySelectorAll('[data-re-action-icon]').length,1);n.click()});assert.deepEqual(clicks,[1,1,0]);
+ d.querySelector('.commonTable').append(d.createElement('span'));await new Promise(r=>setTimeout(r,40));assert.equal(buttons[1].querySelectorAll('[data-re-action-label]').length,1);
+ enabled=false;await changed();buttons.forEach((n,i)=>assert.equal(n.firstChild,originals[i]));assert.equal(buttons[2].disabled,true);assert.deepEqual(clicks,[1,1,0]);w.close();
 });

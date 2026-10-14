@@ -35,3 +35,13 @@ test('compiled React follows replacement of the native form root without stale p
   assert.equal(f.d.querySelectorAll('.bw-section-nav').length,1);assert.equal(f.d.querySelectorAll('.bw-heading-toggle').length,1);assert.equal(f.counts().submits,0);
  }finally{f.close()}
 });
+
+test('chapter navigation preserves the reimbursement route and unsaved fields while scrolling',async()=>{
+ const f=await setup();try{
+  f.w.location.hash='#/reimbursementCreate?formEditId=local';await settle();let scrolls=0;
+  f.d.querySelector('.collapse-box').scrollIntoView=()=>scrolls++;
+  const route=f.w.location.hash,link=f.d.querySelector('.bw-section-nav a');
+  const event=new f.w.MouseEvent('click',{bubbles:true,cancelable:true});link.dispatchEvent(event);await settle();
+  assert.equal(event.defaultPrevented,true);assert.equal(f.w.location.hash,route);assert.equal(scrolls,1);assert.equal(f.counts().toggles,0);assert.equal(f.counts().submits,0);assert.equal(f.input.value,'保留的未保存输入');
+ }finally{f.close()}
+});

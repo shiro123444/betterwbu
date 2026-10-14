@@ -2,6 +2,16 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const core = require('../extension/invoice-core.js');
 const available = core.categories;
 const invoice = (id, amount, fields = {}) => ({barcode:id, totalAmount:amount, ticketName:'电子发票（铁路电子客票）', billTitle:'车票', billData:{trainNO:'G123', ...fields}});
+
+test('a saved sparse invoice awaits rich details instead of being rejected as a non-invoice',()=>{
+ const sparse={barcode:'pending-invoice',dataId:'record-pending',ticketCode:'1-024',billTitle:'电子发票（普通发票）',totalAmount:'112.98'};
+ const pending=core.plan([sparse],[],['其他']).rows[0];
+ assert.equal(pending.detailPending,true);assert.equal(pending.blocked,true);assert.equal(pending.selected,false);
+ assert.match(pending.reason,/详情.*加载/);assert.doesNotMatch(pending.reason,/未识别为发票/);
+ const rich={...sparse,ticketName:sparse.billTitle,billData:{invoiceNO:'real-invoice',totalAmount:'112.98',details:[{inx:'0',content:'代订附加产品',amount:'106.58',taxAmount:'6.40'}]}};
+ const ready=core.plan([sparse],[rich],['其他']).rows[0];
+ assert.equal(ready.blocked,false);assert.equal(ready.detailPending,false);assert.equal(ready.amountCents,11298);
+});
 test('recognized train and accommodation invoices classify and sum in integer cents', () => {
   const bills = [invoice('a','0.10'),invoice('b','0.20'),{barcode:'c',totalAmount:'20.05',ticketName:'增值税普通发票',billData:{hotel:[{hotelName:'酒店'}]}}];
   const p = core.plan(bills,[],available);

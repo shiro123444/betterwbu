@@ -36,7 +36,7 @@ test('headers toggle by original native click exactly once and never call submit
  const f=setup(),s=f.model.scan().sections[0];let toggles=0;s.header.onclick=()=>{toggles++;s.header.setAttribute('aria-expanded','false')};f.model.invoke(s.header);assert.equal(toggles,1);assert.equal(f.model.scan().sections[0].expanded,false);assert.equal(f.counts().submit,0);f.dom.window.close();
 });
 test('native title text nodes and accessibility attributes restore exactly after disable',()=>{
- const f=setup(),header=f.d.querySelector('.ant-collapse-header'),original=[...header.childNodes];header.setAttribute('role','button');header.setAttribute('tabindex','0');f.model.scan();
+ const f=setup(),header=f.d.querySelector('.ant-collapse-header'),original=[...header.childNodes];header.setAttribute('role','button');header.setAttribute('tabindex','0');const s=f.model.scan();f.model.presentHeader(s.sections[0]);
  assert.equal(header.querySelector('[data-bw-native-title]').getAttribute('aria-hidden'),'true');assert.equal(header.getAttribute('role'),'presentation');
  f.model.enable(false);assert.equal(header.getAttribute('role'),'button');assert.equal(header.getAttribute('tabindex'),'0');assert.deepEqual([...header.childNodes],original);f.dom.window.close();
 });
@@ -47,4 +47,37 @@ test('existing toolbar labels still use native section titles after React concea
  dom.window.chrome={storage:{local:{get:async defaults=>defaults},onChanged:{addListener(){}}}};
  dom.window.eval(fs.readFileSync(__dirname+'/../extension/actions.js','utf8'));await new Promise(r=>setTimeout(r,40));
  assert.equal(dom.window.document.querySelector('.btn>.anticon').getAttribute('aria-label'),'添加收款人');model.destroy();dom.window.close();
+});
+
+test('element-wrapped native titles are concealed once and restored without losing node identity',()=>{
+ const f=setup(),header=f.d.querySelector('.ant-collapse-header');
+ const title=f.d.createElement('p');title.innerHTML='<span>基本信息</span>';header.firstChild.replaceWith(title);
+ const s=f.model.scan();assert.equal(s.sections[0].title,'基本信息');
+ assert.equal(title.getAttribute('data-bw-native-title'),'true');assert.equal(title.hasAttribute('aria-hidden'),false);f.model.presentHeader(s.sections[0]);assert.equal(title.getAttribute('aria-hidden'),'true');
+ title.firstChild.textContent='更新后的基本信息';assert.equal(f.model.scan().sections[0].title,'更新后的基本信息');
+ f.model.enable(false);assert.equal(header.firstChild,title);assert.equal(title.hasAttribute('data-bw-native-title'),false);assert.equal(title.hasAttribute('aria-hidden'),false);f.dom.window.close();
+});
+
+test('wrapped row actions replace the whole button and follow native button replacement',()=>{
+ const f=setup(),cell=f.d.querySelector('td'),detail=cell.querySelector('.behavior-detail-btn');
+ const button=f.d.createElement('button');button.type='button';button.className='ant-btn';detail.replaceWith(button);button.append(detail);
+ const copy=cell.querySelector('.anticon-copy'),copyButton=f.d.createElement('button');copyButton.type='button';copy.replaceWith(copyButton);copyButton.append(copy);
+ let copies=0;copyButton.onclick=()=>copies++;
+ let row=f.model.scan().rows[0];assert.equal(row.detail,button);assert.equal(button.getAttribute('data-bw-native-control'),'true');
+ assert.equal(row.menu[1].node,copyButton);f.model.invoke(row.menu[1].node);assert.equal(copies,1);
+ const next=copyButton.cloneNode(true);next.onclick=()=>copies+=10;copyButton.replaceWith(next);row=f.model.scan().rows[0];
+ assert.equal(row.menu[1].node,next);f.model.invoke(row.menu[1].node);assert.equal(copies,11);
+ assert.equal(f.d.querySelectorAll('.bw-row-host').length,1);f.model.enable(false);assert.equal(next.hasAttribute('data-bw-native-control'),false);f.dom.window.close();
+});
+
+test('disabled native action ancestors cannot be invoked through a child icon',()=>{
+ const f=setup(),icon=f.d.querySelector('.anticon-copy'),wrap=f.d.createElement('div');icon.replaceWith(wrap);wrap.setAttribute('aria-disabled','true');wrap.append(icon);
+ assert.equal(f.model.invoke(icon),false);assert.equal(f.counts().copy,0);f.dom.window.close();
+});
+
+test('native header remains keyboard accessible until the React replacement commits',()=>{
+ const f=setup(),h=f.d.querySelector('.ant-collapse-header');h.setAttribute('role','button');h.setAttribute('tabindex','0');const s=f.model.scan();
+ assert.equal(h.getAttribute('role'),'button');assert.equal(h.getAttribute('tabindex'),'0');assert.equal(h.hasAttribute('data-bw-ready'),false);
+ f.model.presentHeader(s.sections[0]);assert.equal(h.getAttribute('role'),'presentation');assert.equal(h.dataset.bwReady,'true');
+ f.model.enable(false);assert.equal(h.getAttribute('role'),'button');assert.equal(h.getAttribute('tabindex'),'0');f.dom.window.close();
 });
