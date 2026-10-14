@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-13",
+  "testedVersion": "0.12.3",
+  "scope": "Local source tests and Chrome synthetic fixture only; no school save, submission, withdrawal or approval calls",
+  "build": "passed",
+  "nodeTests": { "total": 163, "passed": 163, "failed": 0 },
+  "javascriptSyntaxFiles": 29,
+  "manifestReferencesChecked": 38,
+  "browserFixture": "tests/browser/associations/index.html",
+  "browserResults": {
+    "generatedNamedRows": 6,
+    "nativeInvoiceAssociations": 12,
+    "paidRowsWithoutAssociation": 0,
+    "expenseTotal": "2661.00",
+    "paymentTotal": "2661.00",
+    "insuranceRows": 3,
+    "insuranceEach": "80.00",
+    "insuranceLinksEach": ["40.00", "40.00"],
+    "lodgingEach": "807.00",
+    "supportingReceiptUseAmount": "0.00",
+    "overAllocationDisablesGeneration": true,
+    "undoRestoresPreviousRows": true,
+    "readonlyDisablesGeneration": true,
+    "widthsWithoutBodyOrDialogOverflow": [480, 360]
+  },
+  "productionSaveAcceptance": "not tested",
+  "productionAuditAcceptance": "not tested"
+}

@@ -1,7 +1,7 @@
 (() => {
  'use strict';
  const core=window.ReimbursementMemoryCore;
- const defaults={enabled:true,memory:true,memoryBank:true};let settings=defaults,database={},sequence=0,showSequence=0,currentInput,menu;
+ const defaults={enabled:true,memory:true,memoryBank:true};let settings=defaults,database={},sequence=0,showSequence=0,currentInput,menu,returnInput,returnUntil=0;
  const requests=new Map();
  function request(action,fieldId,other={}){return new Promise(resolve=>{
   const id='memory-'+(++sequence);const timer=setTimeout(()=>{requests.delete(id);if(['apply','apply-recipient'].includes(action))window.postMessage({type:'reimbursement-memory-request',id:id+'-cancel',action:'cancel',fieldId},location.origin);resolve(null)},5000);
@@ -38,6 +38,7 @@
    entries=[...rows.filter(Boolean),...entries].filter((e,i,a)=>a.findIndex(x=>x.value===e.value)===i);
   }
   if(!entries.length)return;
+  if(bundle&&window.ReimbursementUI){const picker=window.ReimbursementUI.openRecipientPicker({anchor:input,entries,onClose:close,onValue:async entry=>{close();if(!input.isConnected||input.disabled||input.readOnly||!permitted(d))return;const result=await request('apply-recipient',input.dataset.reMemoryId,{entry,key:d.key,expected:d.value,expectedScope:d.scope,expectedContext:d.context});if(!result?.ok&&input.isConnected)window.ReimbursementUI.notify('未能回填，请重新选择或手动填写。')}});menu={remove:()=>{returnInput=input;returnUntil=Date.now()+300;picker.destroy()},contains:picker.contains};return}
   const host=document.createElement('div'),shadow=host.attachShadow({mode:'open'}),style=document.createElement('style');
   style.textContent=':host{position:fixed;z-index:1100;display:block;font:14px system-ui;color:rgba(0,0,0,.85)}ul{margin:0;padding:4px;background:white;border:1px solid #d9d9d9;border-radius:4px;box-shadow:0 6px 16px #00000014;max-height:240px;overflow:auto;list-style:none}li{padding:8px 10px;cursor:pointer;white-space:pre-wrap;overflow-wrap:anywhere}li:hover,li[aria-selected="true"]{background:#e6f7ff}.notice{background:#fff;padding:10px;border:1px solid #d9d9d9;border-radius:4px}';
   shadow.append(style);const list=document.createElement('ul');list.setAttribute('role','listbox');list.setAttribute('aria-label',bundle?'已保存收款人':d.label);shadow.append(list);
@@ -61,12 +62,12 @@
  }
  const pickerStyle=document.createElement('style');pickerStyle.textContent='.re-recipient-picker{position:relative!important}.re-recipient-picker input[data-re-memory-key="bankAccountName"]{padding-right:28px!important}[data-re-recipient-arrow]{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:24px;height:24px;padding:0;border:0;background:transparent;color:#8c8c8c;cursor:pointer;font:18px system-ui}[data-re-recipient-arrow]:hover{color:#1890ff}[data-re-recipient-arrow]:focus-visible{outline:2px solid #1890ff}';document.documentElement.append(pickerStyle);
  new MutationObserver(decorate).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['data-re-memory-key','disabled','readonly']});
- document.addEventListener('focusin',e=>{const input=e.target;if(input?.dataset?.reMemoryId)show(input)});
+ document.addEventListener('focusin',e=>{const input=e.target;if(input===returnInput&&Date.now()<returnUntil){returnInput=null;return}if(input?.dataset?.reMemoryId)show(input)});
  document.addEventListener('input',e=>{const input=e.target;if(input?.dataset?.reMemoryId)show(input)});
  document.addEventListener('keydown',e=>{if(e.target?.dataset?.reMemoryId&&e.target.onReMemoryKey)e.target.onReMemoryKey(e)},true);
  document.addEventListener('change',e=>{if(e.target?.dataset?.reMemoryId)capture(e.target)});
- document.addEventListener('focusout',e=>{const input=e.target;if(!input?.dataset?.reMemoryId)return;setTimeout(async()=>{if(document.activeElement!==input){if(currentInput===input){currentInput=null;close()}await capture(input)}},160)});
- window.addEventListener('scroll',close,true);window.addEventListener('resize',close);
+ document.addEventListener('focusout',e=>{const input=e.target;if(!input?.dataset?.reMemoryId)return;setTimeout(async()=>{if(menu?.contains?.(document.activeElement))return;if(document.activeElement!==input){if(currentInput===input){currentInput=null;close()}await capture(input)}},160)});
+ window.addEventListener('scroll',e=>{if(!menu?.contains?.(e.target))close()},true);window.addEventListener('resize',close);
  chrome.storage.onChanged.addListener(load);load();
  chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   if(message.type!=='remember-current-form')return;

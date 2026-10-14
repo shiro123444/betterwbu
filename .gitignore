@@ -7,6 +7,9 @@
 !/development/reimbursement-enhancer/
 /development/reimbursement-enhancer/*
 !/development/reimbursement-enhancer/package.json
+!/development/reimbursement-enhancer/package-lock.json
+!/development/reimbursement-enhancer/src/
+!/development/reimbursement-enhancer/scripts/
 !/development/reimbursement-enhancer/extension/
 !/development/reimbursement-enhancer/tests/
 

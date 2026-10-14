@@ -1,0 +1,31 @@
+{
+  "date": "2026-10-13",
+  "version": "0.13.1",
+  "focusedTests": 15,
+  "allNodeTestsPassed": 188,
+  "syntheticBrowser": {
+    "delayedTaskStaticLabel": "passed",
+    "pendingAnimationHiddenOnTimeout": "passed",
+    "missingResultNeverReportsSuccess": "passed",
+    "matchingInvoiceReportsRecognized": "passed",
+    "matchingRepeatReportsDuplicate": "passed",
+    "queryFailureIsVisible": "passed",
+    "financialWrites": 0
+  },
+  "productionTrace": {
+    "original850RecordFoundInUsedReceipts": true,
+    "originalIdAndRecognitionInstanceUnchanged": true,
+    "originalUpdateTimeUnchanged": true,
+    "newUploadToOriginalMergeRelationshipFound": false,
+    "explicitFailureResponseFound": false,
+    "terminalUploadOutcome": "unconfirmed; requires backend task logs"
+  },
+  "safety": {
+    "queries": "native findBillFolderCardList only",
+    "pollOnlyManagementRoute": true,
+    "skipSelectedRowsUploadsEditingAndHiddenPages": true,
+    "requestTimeoutSeconds": 30,
+    "pollMinimumSeconds": 30,
+    "originalSubmittedReimbursementModified": false
+  }
+}

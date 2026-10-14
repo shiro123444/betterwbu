@@ -1,0 +1,51 @@
+/* Information management shares the form's blue/gray tokens and 8px radius. */
+:host{--bw-blue:#2878ff;--bw-ink:#252d3a;--bw-muted:#687385;--bw-line:#e2e6ec;--bw-radius:8px;position:fixed;inset:0;z-index:999;pointer-events:none;font:16px/1.5 system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;color:var(--bw-ink)}
+*{box-sizing:border-box}[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit;max-width:100%;min-width:0}
+button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:8px 12px;line-height:24px;font-size:15px;border:1px solid var(--bw-line);border-radius:var(--bw-radius);background:#fff;cursor:pointer;touch-action:manipulation}
+button:hover{border-color:#a7b9d0;background:#f7f9fc}button:disabled{opacity:.45;cursor:default}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #9fc3ff;outline-offset:2px}
+.trigger{pointer-events:auto;position:absolute;right:24px;top:68px;min-height:42px;background:#fff;font-size:15px}
+.panel{pointer-events:auto;position:absolute;right:0;top:var(--manager-top,132px);bottom:0;width:min(400px,100vw);border-left:1px solid var(--bw-line);background:#fff;display:flex;flex-direction:column;min-height:0;box-shadow:none}
+.heading{display:flex;align-items:center;justify-content:space-between;gap:16px;flex:none;padding:20px 24px;border-bottom:1px solid var(--bw-line);font-size:20px;font-weight:600}
+.heading .close{display:flex;align-items:center;justify-content:center;flex:0 0 42px;width:42px;height:42px;padding:0;border:1px solid var(--bw-line);border-radius:var(--bw-radius);background:#fff;font-size:24px;font-weight:400;gap:0}
+.heading .close:has(svg),.record>button:has(svg){font-size:0}.close svg,.record>button svg{width:18px;height:18px;flex:none}
+svg[data-re-action-icon]{width:18px;height:18px;flex:0 0 18px;pointer-events:none}
+.tabs{flex:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:12px 24px;border-bottom:1px solid var(--bw-line)}
+.tabs button{border:0;border-radius:var(--bw-radius);padding:8px 6px;white-space:normal;background:transparent;font-size:15px;color:var(--bw-muted)}
+.tabs [aria-selected="true"]{background:#edf4ff;color:#1765e8;font-weight:600}
+.content{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:24px;scrollbar-gutter:stable}
+.content [role="tabpanel"]{min-width:0}.content [role="tabpanel"]>.primary{width:100%;margin-bottom:20px}
+h3{font-size:18px;line-height:1.5;font-weight:600;margin:0 0 16px}
+.record{display:flex;align-items:flex-start;gap:12px;padding:20px 0;border-bottom:1px solid var(--bw-line)}
+.record:first-child{padding-top:0}.record-body{flex:1;min-width:0}.record>button{flex:none;width:42px;height:42px;padding:0;border-color:transparent;color:var(--bw-muted);font-size:22px}
+.record>button:hover{color:#b83434;background:#fff0ef;border-color:#ffd7d4}
+.value{font-size:16px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+.recipient-name{font-size:18px;font-weight:600;margin-bottom:6px}
+.muted{color:var(--bw-muted);font-size:14px;line-height:1.7;overflow-wrap:anywhere}
+.link,.record .link{min-height:36px;border:0;padding:6px 12px 6px 0;background:transparent;color:#1765e8;font-size:14px;margin:4px 8px 0 0}
+.link:hover{color:var(--bw-blue);background:transparent;text-decoration:underline}
+.primary{background:var(--bw-blue);border-color:var(--bw-blue);color:#fff}.primary:hover{background:#1765e8;border-color:#1765e8;color:#fff}
+.editor{padding:0 0 24px;margin:0 0 24px;border:0;border-bottom:1px solid var(--bw-line)}
+.field{display:flex;flex-direction:column;gap:8px;margin:0 0 20px;min-width:0}
+.field>span{font-size:15px;color:var(--bw-muted)}
+.field input,.field select,.field textarea{width:100%;min-height:44px;border:1px solid #d8dee7;border-radius:var(--bw-radius);padding:9px 12px;background:#fff;font-size:16px;line-height:24px}
+.field input[readonly]{background:#f7f8fa;color:var(--bw-muted)}
+.field textarea{resize:vertical;min-height:100px}
+.bank-mode{display:flex;align-items:center;gap:10px;margin:0 0 20px;font-size:15px}
+input[type="checkbox"]{width:18px;height:18px;flex:0 0 18px;margin:0;accent-color:var(--bw-blue);cursor:pointer}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}.actions>.primary{flex:1}.actions>button{min-width:88px}
+.editor .actions{position:sticky;bottom:0;z-index:2;background:#fff;border-top:1px solid var(--bw-line);padding:16px 24px;margin:20px -24px -24px}
+.content{scroll-padding-bottom:92px}.editor :is(input,textarea,select){scroll-margin-bottom:92px}
+.bank-results{max-height:220px;overflow:auto;min-width:0;margin:0 0 20px;border-radius:var(--bw-radius)}
+.bank-results:empty{display:none}
+.bank-option{display:block;width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere;line-height:1.6;border:0;border-bottom:1px solid var(--bw-line);border-radius:0;padding:12px}
+.bank-option:hover,.bank-option[aria-selected="true"]{background:#edf4ff;color:#1765e8}.more{width:100%}
+.group{margin:0;padding:0;border:0}.settings-group{margin:24px 0 0;padding:0;border:0;min-width:0}.settings-group legend{font-size:14px;color:var(--bw-muted);font-weight:600;padding:0 0 8px}
+.label{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0;padding:14px 0;border-bottom:1px solid #eef0f4;line-height:1.6;font-size:15px}
+.label input{order:2}.label span{order:1;min-width:0}.label:first-child{padding-top:0}
+.notice{flex:none;font-size:14px;line-height:1.6;color:var(--bw-muted);padding:12px 24px;border-top:1px solid var(--bw-line);overflow-wrap:anywhere}.notice:empty{display:none}
+.clear-recipients{margin-top:24px;width:100%;background:#fff;color:var(--bw-muted)}
+@media(max-width:1100px){.panel{width:100vw;left:0;border-left:0}.heading{padding:16px 20px}.content{padding:20px}.tabs{padding:12px 20px}.notice{padding:12px 20px}}
+@media(max-width:1100px){.editor .actions{padding:14px 20px;margin-left:-20px;margin-right:-20px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}

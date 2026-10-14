@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-13",
+  "sourceVersion": "0.12.4",
+  "build": "passed",
+  "nodeTests": { "total": 171, "passed": 171, "failed": 0 },
+  "browserScope": "A separate real saved draft with a temporary stylesheet containing the source fix; installed-extension reload deferred by user",
+  "reproduced": {
+    "hiddenFormShellScrollTop": 82,
+    "hiddenBillBoxScrollTop": 3659,
+    "cause": "Native fixed-height overflow:hidden ancestors are scrolled by scrollIntoView and cannot be scrolled back by the mouse wheel"
+  },
+  "fixed": {
+    "scrollOwner": "content-box > layout-content",
+    "hiddenFormShellScrollTop": 0,
+    "hiddenBillBoxScrollTop": 0,
+    "expenseNavigationOuterScrollTop": 3430,
+    "imageNavigationOuterScrollTop": 62,
+    "controlHomeOuterScrollTop": 0
+  },
+  "financialChecks": {
+    "newDraftBasicSaveAndReopen": "passed",
+    "invoiceAssociationSaveAndReopen": "blocked: original receipts are already used and not selectable in a new draft",
+    "originalFormModified": false,
+    "receiptsTransferred": false,
+    "newDraftSubmitted": false
+  }
+}

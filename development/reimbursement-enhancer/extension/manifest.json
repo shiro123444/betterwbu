@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "报销系统交互优化",
-  "version": "0.11.9",
+  "version": "0.13.4",
   "minimum_chrome_version": "111",
   "description": "改善报销布局与发票加载，预览生成费用明细，复用收款资料并同步金额。",
   "permissions": [
@@ -32,6 +32,7 @@
         "basic-core.js",
         "basic-bridge.js",
         "expenses.js",
+        "invoice-associations.js",
         "invoice-core.js",
         "invoices.js",
         "enhance.js"
@@ -48,8 +49,10 @@
         "memory-core-isolated.js",
         "basic-core-http-isolated.js",
         "control.js",
+        "workspace.js",
         "memory.js",
         "basic-ui-http.js",
+        "manager-theme.js",
         "memory-manager.js",
         "actions.js",
         "polish.js",
@@ -60,7 +63,9 @@
         "audit-layout.js"
       ],
       "css": [
-        "polish.css"
+        "polish.css",
+        "workspace.css",
+        "components.css"
       ],
       "run_at": "document_start"
     },
@@ -74,10 +79,14 @@
         "polish.js",
         "wallet-feedback.js",
         "wallet-layout.js",
-        "waiting.js"
+        "waiting.js",
+        "workspace-theme.js",
+        "wallet-recognition-ui.js"
       ],
       "css": [
-        "polish.css"
+        "polish.css",
+        "workspace.css",
+        "wallet-recognition.css"
       ],
       "all_frames": true,
       "run_at": "document_start"
@@ -88,6 +97,8 @@
         "https://wsbx.wbu.edu.cn/bill-wallet-web/*"
       ],
       "js": [
+        "wallet-recognition-core.js",
+        "wallet-recognition.js",
         "wallet-bridge.js"
       ],
       "world": "MAIN",

@@ -14,19 +14,19 @@
 [data-re-action]:focus-visible {outline:3px solid #91caff;outline-offset:2px}
 [data-re-action]:disabled,[data-re-action][aria-disabled="true"] {opacity:.5;cursor:default}
 [data-re-action].ant-dropdown-trigger:after {content:'';border:4px solid transparent;border-top-color:currentColor;transform:translateY(2px);margin-left:4px}
-html[data-re-visual="true"] .reimbursementCreate .btn:has([data-re-action]) {display:flex!important;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px;line-height:1.4!important;padding:14px 0;min-height:70px;height:auto!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-extra-content .btn {gap:12px;min-height:82px}
-html[data-re-visual="true"] .reimbursementCreate .title-box:has([data-re-action]) {height:auto!important;min-height:70px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-html[data-re-visual="true"] .reimbursementCreate .title-box:has([data-re-action])>.btn {float:none!important;width:auto!important;margin-left:auto!important}
-html[data-re-visual="true"] .reimbursementCreate .custom-forms-render.commit-bill {padding-bottom:104px;scroll-padding-bottom:112px}
-html[data-re-visual="true"] .reimbursementCreate .button-box[data-re-footer-layout="true"] {left:var(--re-footer-left)!important;width:var(--re-footer-width)!important;height:auto!important;min-height:82px;box-sizing:border-box;padding:16px clamp(16px,3vw,40px)!important;white-space:normal!important}
-html[data-re-visual="true"] .reimbursementCreate .button-box>.fr {display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;width:100%;max-width:100%;float:none!important}
-html[data-re-visual="true"] .reimbursementCreate .button-box>.fr>button {height:42px!important;min-height:42px;max-width:100%;margin:0!important;padding:9px 14px!important;box-sizing:border-box}
-html[data-re-visual="true"] .layout-content .reimbursementCreate .custom-forms-render.commit-bill {padding-bottom:var(--re-footer-height,104px)!important;scroll-padding-bottom:var(--re-footer-height,112px)}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-bar {height:auto!important;min-height:96px}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav-container,
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav-wrap,
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav-scroll {height:auto!important;min-height:96px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .btn:has([data-re-action]) {display:flex!important;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px;line-height:1.4!important;padding:14px 0;min-height:70px;height:auto!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-extra-content .btn {gap:12px;min-height:82px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .title-box:has([data-re-action]) {height:auto!important;min-height:70px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .title-box:has([data-re-action])>.btn {float:none!important;width:auto!important;margin-left:auto!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .custom-forms-render.commit-bill {padding-bottom:104px;scroll-padding-bottom:112px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .button-box[data-re-footer-layout="true"] {left:var(--re-footer-left)!important;width:var(--re-footer-width)!important;height:auto!important;min-height:82px;box-sizing:border-box;padding:16px clamp(16px,3vw,40px)!important;white-space:normal!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .button-box>.fr {display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;width:100%;max-width:100%;float:none!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .button-box>.fr>button {height:42px!important;min-height:42px;max-width:100%;margin:0!important;padding:9px 14px!important;box-sizing:border-box}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .layout-content .reimbursementCreate .custom-forms-render.commit-bill {padding-bottom:var(--re-footer-height,104px)!important;scroll-padding-bottom:var(--re-footer-height,112px)}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-bar {height:auto!important;min-height:96px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-nav-container,
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-nav-wrap,
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-nav-scroll {height:auto!important;min-height:96px}
 .re-category-select {appearance:none;font:500 15px/22px system-ui;color:#1765e8;min-height:42px;min-width:142px;max-width:220px;padding:9px 34px 9px 40px;border:1px solid #91baff;border-radius:6px;cursor:pointer;background:#f8fbff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%231765e8' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E") no-repeat 14px center}
 [data-re-expense-categories] {position:relative;flex:0 0 auto}
 [data-re-expense-categories]:after {content:'';position:absolute;right:14px;top:50%;border:4px solid transparent;border-top-color:#1765e8;pointer-events:none}
@@ -40,7 +40,7 @@ html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav
 html[data-re-manager-ready="true"] .multi-tab>.ant-tabs-bar {padding-right:112px!important}
 html[data-re-manager-open="true"] .content-box>.layout-content {width:calc(100% - 400px)!important;max-width:calc(100% - 400px)!important}
 .content-box>.layout-content {container-type:inline-size;min-width:0}
-@media(max-width:900px){html[data-re-manager-open="true"] .content-box>.layout-content {visibility:hidden;width:100%!important;max-width:100%!important}}
+@media(max-width:1100px){html[data-re-manager-open="true"] .content-box>.layout-content {visibility:hidden;width:100%!important;max-width:100%!important}}
 .re-basic-shortcut {display:inline-flex;align-items:center;gap:8px;margin-right:14px;font-size:13px;font-weight:400;vertical-align:middle}
 .re-basic-shortcut button,.re-basic-shortcut select {font:inherit;border:1px solid #d9d9d9;border-radius:4px;background:#fff;padding:4px 10px;min-height:30px;color:rgba(0,0,0,.85)}
 .re-basic-shortcut select {max-width:160px}
@@ -49,87 +49,87 @@ html[data-re-manager-open="true"] .content-box>.layout-content {width:calc(100% 
 .re-basic-shortcut button:focus-visible,.re-basic-shortcut select:focus-visible {outline:2px solid #1890ff;outline-offset:2px}
 .re-basic-shortcut [role="status"] {color:rgba(0,0,0,.55);font-size:12px}
 @media(max-width:600px){.re-basic-shortcut{margin-right:0;gap:4px}.re-basic-shortcut select{max-width:100px}}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box {
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box {
  margin-bottom:16px;border:1px solid #e8e8e8!important;border-radius:6px;
  box-shadow:0 1px 3px rgba(0,0,0,.035);background:#fff;
 }
-html[data-re-visual="true"] .reimbursementCreate .collapse-box>.ant-collapse-item {border-bottom:0}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-header {
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box>.ant-collapse-item {border-bottom:0}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-header {
  padding:16px 40px 16px 24px!important;font-weight:600;font-size:18px;
  height:auto!important;min-height:60px;line-height:28px!important;display:flex;align-items:center;flex-wrap:wrap;gap:12px;overflow:visible!important;
 }
-html[data-re-visual="true"] .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-header>.ant-collapse-extra {height:auto!important;line-height:28px!important;float:none!important;margin-left:auto;max-width:100%;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-header>.ant-collapse-arrow {top:50%!important;transform:translateY(-50%);margin:0!important}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-content {
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-header>.ant-collapse-extra {height:auto!important;line-height:28px!important;float:none!important;margin-left:auto;max-width:100%;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-header>.ant-collapse-arrow {top:50%!important;transform:translateY(-50%);margin:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-content {
  border-top:1px solid #f0f0f0!important;
 }
-html[data-re-visual="true"] .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {
  padding:24px!important;
 }
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col>.ant-form-item {
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col>.ant-form-item {
  margin-bottom:22px;
 }
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col>.ant-form-item>.ant-form-item-label {
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col>.ant-form-item>.ant-form-item-label {
  width:110px!important;padding-right:14px;
 }
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form-item-label label {font-weight:500}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form-item-label p {margin-bottom:0}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form-item-label label {height:auto;min-height:40px;line-height:24px;font-size:16px}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form-item-control {font-size:16px}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-input {font-size:16px;min-height:42px;padding:8px 12px;line-height:24px}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box textarea.ant-input {min-height:88px!important;line-height:1.7}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {height:42px!important;font-size:16px;padding:0 12px}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-select-single .ant-select-selection-item,
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-select-single .ant-select-selection-placeholder {line-height:40px!important}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-input-number {min-height:42px;font-size:16px}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-input-number-input {height:40px;line-height:40px}
-html[data-re-visual="true"] .reimbursementCreate .ant-table-tbody>tr>td {padding-top:14px;padding-bottom:14px}
-html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form-item-control {min-width:0}
-html[data-re-visual="true"] .reimbursementCreate .ant-select-disabled .ant-select-selection-item,
-html[data-re-visual="true"] .reimbursementCreate .ant-input:disabled,
-html[data-re-visual="true"] .reimbursementCreate .ant-input-number-disabled .ant-input-number-input {
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form-item-label label {font-weight:500}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form-item-label p {margin-bottom:0}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form-item-label label {height:auto;min-height:40px;line-height:24px;font-size:16px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form-item-control {font-size:16px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-input {font-size:16px;min-height:42px;padding:8px 12px;line-height:24px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box textarea.ant-input {min-height:88px!important;line-height:1.7}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {height:42px!important;font-size:16px;padding:0 12px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-select-single .ant-select-selection-item,
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-select-single .ant-select-selection-placeholder {line-height:40px!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-input-number {min-height:42px;font-size:16px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-input-number-input {height:40px;line-height:40px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-table-tbody>tr>td {padding-top:14px;padding-bottom:14px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form-item-control {min-width:0}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-select-disabled .ant-select-selection-item,
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-input:disabled,
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-input-number-disabled .ant-input-number-input {
  color:rgba(0,0,0,.55);
 }
-html[data-re-visual="true"] .reimbursementCreate .ant-table-thead>tr>th {font-weight:500}
-html[data-re-visual="true"] .reimbursementCreate .ant-table-tbody>tr>td {vertical-align:middle}
-html[data-re-visual="true"] .reimbursementCreate .ant-input-number-input,
-html[data-re-visual="true"] .reimbursementCreate .money {font-variant-numeric:tabular-nums}
-html[data-re-visual="true"] .reimbursementCreate .ant-collapse-extra .behaviorName {font-size:12px;font-weight:400;color:rgba(0,0,0,.55)}
-html[data-re-visual="true"] .reimbursementCreate .ant-collapse-extra .behaviorNum {font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;margin-left:8px}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box {margin:20px 0!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-tab {padding:14px 18px!important;margin-right:16px!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .tabClass {display:flex!important;align-items:center;gap:12px;min-width:136px;width:auto!important;height:auto!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .behaviors-div {float:none!important;width:28px!important;height:28px!important;flex:0 0 28px;display:flex;align-items:center;justify-content:center}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .behaviors-div img {max-width:20px;max-height:20px}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .behavior-text {float:none!important;margin:0!important;width:auto!important;height:auto!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .behaviorName {font-size:15px;line-height:1.6}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .behaviorNum {font-size:20px;font-weight:600;line-height:1.6;font-variant-numeric:tabular-nums}
-@container(max-width:1100px){html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-8 {flex:0 0 50%;max-width:50%}}
-@container(max-width:740px){html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-8,html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-12 {flex:0 0 100%;max-width:100%}}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-table-thead>tr>th {font-weight:500}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-table-tbody>tr>td {vertical-align:middle}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-input-number-input,
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .money {font-variant-numeric:tabular-nums}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-collapse-extra .behaviorName {font-size:12px;font-weight:400;color:rgba(0,0,0,.55)}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .ant-collapse-extra .behaviorNum {font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;margin-left:8px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box {margin:20px 0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-tab {padding:14px 18px!important;margin-right:16px!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .tabClass {display:flex!important;align-items:center;gap:12px;min-width:136px;width:auto!important;height:auto!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .behaviors-div {float:none!important;width:28px!important;height:28px!important;flex:0 0 28px;display:flex;align-items:center;justify-content:center}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .behaviors-div img {max-width:20px;max-height:20px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .behavior-text {float:none!important;margin:0!important;width:auto!important;height:auto!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .behaviorName {font-size:15px;line-height:1.6}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .behaviorNum {font-size:20px;font-weight:600;line-height:1.6;font-variant-numeric:tabular-nums}
+@container(max-width:1100px){html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-8 {flex:0 0 50%;max-width:50%}}
+@container(max-width:740px){html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-8,html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-12 {flex:0 0 100%;max-width:100%}}
 /* Wrap native category tabs when the content pane is narrow. */
 @container(max-width:1000px){
- html[data-re-visual="true"] .table-level2-box>.ant-tabs {width:100%!important}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-extra-content {float:none!important;width:100%}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-extra-content .btn {justify-content:flex-start!important;min-height:0;padding:8px 0 16px}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-nav-container {clear:both;width:100%;overflow:visible}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-nav-wrap {margin:0!important;overflow:visible}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-nav-scroll {overflow:visible}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-nav {transform:none!important;width:100%!important}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-nav>div {display:flex;flex-wrap:wrap;gap:12px}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-tab {flex:0 0 calc(50% - 6px);min-width:0;margin:0!important}
- html[data-re-visual="true"] .table-level2-box .tabClass {min-width:0;width:100%!important}
- html[data-re-visual="true"] .table-level2-box .behaviorNum {white-space:nowrap}
- html[data-re-visual="true"] .table-level2-box .ant-tabs-tab-prev,
- html[data-re-visual="true"] .table-level2-box .ant-tabs-tab-next {display:none!important}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box>.ant-tabs {width:100%!important}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-extra-content {float:none!important;width:100%}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-extra-content .btn {justify-content:flex-start!important;min-height:0;padding:8px 0 16px}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-nav-container {clear:both;width:100%;overflow:visible}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-nav-wrap {margin:0!important;overflow:visible}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-nav-scroll {overflow:visible}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-nav {transform:none!important;width:100%!important}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-nav>div {display:flex;flex-wrap:wrap;gap:12px}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-tab {flex:0 0 calc(50% - 6px);min-width:0;margin:0!important}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .tabClass {min-width:0;width:100%!important}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .behaviorNum {white-space:nowrap}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-tab-prev,
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-tab-next {display:none!important}
 }
 @container(max-width:550px){
- html[data-re-visual="true"] .table-level2-box .ant-tabs-tab {flex-basis:100%}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .table-level2-box .ant-tabs-tab {flex-basis:100%}
 }
 @media(max-width:1050px){
- html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-8 {flex:0 0 50%;max-width:50%}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-8 {flex:0 0 50%;max-width:50%}
 }
 @media(max-width:720px){
- html[data-re-visual="true"] .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-8 {flex:0 0 100%;max-width:100%}
+ html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .collapse-box .ant-form>.ant-row>.ant-col-8 {flex:0 0 100%;max-width:100%}
 }
 /* Native blocking waits only; no page or section entry animations. */
 html[data-re-waiting="true"] #app {isolation:isolate}
@@ -223,20 +223,20 @@ button[data-re-confirming="true"]:after { content:'添加中'; }
 .file-fixed:has(button[data-re-confirming="true"]) > div { display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px; }
 @media(prefers-reduced-motion:reduce) { button[data-re-confirming="true"]:before { animation:none; } }
 /* Expense controls have their own row; category cards use the full content width. */
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-bar {display:flex!important;flex-direction:column;gap:12px;height:auto!important;padding-bottom:14px}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-extra-content {float:none!important;order:2;width:100%;max-width:100%}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-extra-content .btn {display:flex!important;flex-wrap:wrap;justify-content:flex-end!important;align-items:center;gap:10px;min-height:0!important;line-height:normal!important;padding:0!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-extra-content [data-re-action],
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-extra-content .re-category-select {min-height:40px!important;padding:8px 14px!important;font-size:14px!important;margin:0!important;min-width:0}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav-container {order:1;clear:both;width:100%!important;overflow:visible!important;padding:0!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav-wrap {margin:0!important;overflow:visible!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav-scroll {overflow:visible!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav {transform:none!important;width:100%!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-nav>div {display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px;white-space:normal}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-tab {min-width:0!important;margin:0!important;padding:16px!important;box-sizing:border-box}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .tabClass {min-width:0;width:100%!important}
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-tab-prev,
-html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-tab-next {display:none!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-bar {display:flex!important;flex-direction:column;gap:12px;height:auto!important;padding-bottom:14px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-extra-content {float:none!important;order:2;width:100%;max-width:100%}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-extra-content .btn {display:flex!important;flex-wrap:wrap;justify-content:flex-end!important;align-items:center;gap:10px;min-height:0!important;line-height:normal!important;padding:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-extra-content [data-re-action],
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-extra-content .re-category-select {min-height:40px!important;padding:8px 14px!important;font-size:14px!important;margin:0!important;min-width:0}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-nav-container {order:1;clear:both;width:100%!important;overflow:visible!important;padding:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-nav-wrap {margin:0!important;overflow:visible!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-nav-scroll {overflow:visible!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-nav {transform:none!important;width:100%!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-nav>div {display:grid!important;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px;white-space:normal}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-tab {min-width:0!important;margin:0!important;padding:16px!important;box-sizing:border-box}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .tabClass {min-width:0;width:100%!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-tab-prev,
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .reimbursementCreate .table-level2-box .ant-tabs-tab-next {display:none!important}
 .re-invoice-dialog {width:min(1120px,calc(100vw - 40px));height:min(820px,calc(100dvh - 48px));max-height:calc(100dvh - 48px);border:0;border-radius:20px;padding:28px;box-shadow:0 24px 90px #142c4e30;overflow:hidden;color:#26344b;box-sizing:border-box}
 .re-invoice-dialog[open] {display:flex;flex-direction:column;gap:16px}
 .re-invoice-heading {display:flex;justify-content:space-between;align-items:center;flex:none}
@@ -278,6 +278,19 @@ html[data-re-visual="true"] .reimbursementCreate .table-level2-box .ant-tabs-tab
 .re-invoice-dialog-actions {padding-top:12px;border-top:1px solid #e8edf4;flex:none}
 .re-invoice-dialog-actions button {min-height:42px;padding:9px 20px}
 .re-invoice-update-status {font-size:12px;color:#2878ff;flex:none}
+.re-invoice-allocation {margin:0 0 18px 30px;padding:12px 16px;border:1px solid #e5ebf3;border-radius:8px;min-width:0}
+.re-invoice-allocation>summary {font-size:14px;color:#526277}
+.re-invoice-allocation-tools {display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-top:12px}
+.re-invoice-allocation-tools>label {flex:1;min-width:120px;display:flex!important;flex-direction:column;align-items:stretch!important;font-size:14px}
+.re-invoice-allocation input[type="text"] {box-sizing:border-box;width:100%;min-width:0;padding:10px 12px;font-size:16px;border:1px solid #d9e2ed;border-radius:8px;min-height:42px}
+.re-invoice-allocation-tools button {min-height:42px;padding:8px 14px}
+.re-invoice-allocation-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:12px;margin-top:12px}
+.re-invoice-allocation-grid label {display:flex!important;flex-direction:column;align-items:stretch!important;font-size:14px;min-width:0}
+.re-invoice-allocation small {display:block;line-height:1.6;color:#7a899e;margin-top:8px;overflow-wrap:anywhere}
+.re-invoice-supports {margin-top:12px}
+.re-invoice-allocation:not([data-category="住宿"]) .re-invoice-supports {display:none}
+.re-invoice-supports>label {display:flex!important;margin:8px 0;overflow-wrap:anywhere}
+.re-invoice-supports input[type="checkbox"] {flex:none}
 @media(max-width:650px){.re-invoice-dialog{padding:18px;width:calc(100vw - 20px);height:calc(100dvh - 24px);max-height:calc(100dvh - 24px)}.re-invoice-metrics{gap:8px;grid-template-columns:1fr 1fr}.re-invoice-metric{padding:12px}.re-invoice-metric strong{font-size:22px}.re-invoice-metric--primary{grid-column:1/-1}.re-invoice-columns{display:none}.re-invoice-row{grid-template-columns:20px minmax(0,1fr);gap:8px}.re-invoice-dialog .re-allowance-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.re-invoice-toolbar{gap:6px}.re-invoice-toolbar select{flex:1}.re-invoice-toolbar .re-invoice-refresh{margin-left:0}}
 /* Shared centered layout for wallet management and selection routes. */
 html[data-re-wallet-picker="true"],html[data-re-wallet-picker="true"] body,html[data-re-wallet-picker="true"] #app {height:100%;min-height:0;overflow:hidden}
@@ -319,57 +332,57 @@ html[data-re-wallet-picker="true"] .bill-item .file-item-col {width:100%!importa
 @media(max-width:650px){.re-invoice-row select,.re-invoice-row .re-invoice-amount{grid-column:2}.re-invoice-row .re-invoice-amount{text-align:left}}
 
 /* Submitted detail layout: one centered flow, native read-only records. */
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc{max-width:1200px;margin:16px auto 16px;box-sizing:border-box;border-radius:14px;overflow:hidden}
-html[data-re-visual="true"] [data-re-detail-layout="true"]{height:auto!important;min-height:0!important}
-html[data-re-visual="true"] [data-re-audit-layout="true"]{display:flex!important;flex-direction:column;gap:16px;width:100%!important;max-width:1200px;height:auto!important;min-height:0;overflow:visible!important;padding:0 0 128px!important;margin:0 auto;box-sizing:border-box}
-html[data-re-visual="true"] [data-re-audit-layout="true"]>.commit-bill-audit{order:1;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;min-width:0;margin:0!important;padding:0!important;background:transparent!important}
-html[data-re-visual="true"] [data-re-audit-layout="true"]>.activeAuditDiv{order:2;position:static!important;width:100%!important;height:auto!important;max-height:none!important;margin:0!important;min-width:0;background:transparent!important}
-html[data-re-visual="true"] [data-re-audit-layout="true"]>.commit-bill-audit>.ant-collapse{border:1px solid #e8edf5!important;border-radius:14px!important;overflow:hidden;box-shadow:none!important}
-html[data-re-visual="true"] [data-re-audit-layout="true"]>.commit-bill-audit>.ant-collapse .ant-collapse-header,html[data-re-visual="true"] [data-re-audit-layout="true"]>.commit-bill-audit>.ant-collapse .ant-collapse-content{border-radius:0!important}
-html[data-re-visual="true"] .layout-content [data-re-detail-layout="true"] [data-re-audit-layout="true"]>.custom-forms-render.commit-bill-audit{padding-bottom:0!important}
-html[data-re-visual="true"] [data-re-audit-layout="true"] .shrinkIcon,html[data-re-visual="true"] [data-re-audit-layout="true"] .shrinkIcon2,html[data-re-visual="true"] [data-re-audit-warnings="true"]{display:none!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"]{display:block!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:8px 24px 24px;box-sizing:border-box;background:#fff;border:1px solid #e8edf5;border-radius:16px}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .ant-tabs-content{margin-left:0!important;transform:none!important;display:block!important;height:auto!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .ant-tabs-tabpane{width:100%!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .timeline-content{height:auto!important;max-height:none!important;overflow:visible!important;padding:12px 0 0!important}
-html[data-re-visual="true"] [data-re-audit-layout="true"] .ant-collapse-content-active{height:auto!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc{max-width:1200px;margin:16px auto 16px;box-sizing:border-box;border-radius:14px;overflow:hidden}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-detail-layout="true"]{height:auto!important;min-height:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"]{display:flex!important;flex-direction:column;gap:16px;width:100%!important;max-width:1200px;height:auto!important;min-height:0;overflow:visible!important;padding:0 0 128px!important;margin:0 auto;box-sizing:border-box}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"]>.commit-bill-audit{order:1;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;min-width:0;margin:0!important;padding:0!important;background:transparent!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"]>.activeAuditDiv{order:2;position:static!important;width:100%!important;height:auto!important;max-height:none!important;margin:0!important;min-width:0;background:transparent!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"]>.commit-bill-audit>.ant-collapse{border:1px solid #e8edf5!important;border-radius:14px!important;overflow:hidden;box-shadow:none!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"]>.commit-bill-audit>.ant-collapse .ant-collapse-header,html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"]>.commit-bill-audit>.ant-collapse .ant-collapse-content{border-radius:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) .layout-content [data-re-detail-layout="true"] [data-re-audit-layout="true"]>.custom-forms-render.commit-bill-audit{padding-bottom:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"] .shrinkIcon,html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"] .shrinkIcon2,html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-warnings="true"]{display:none!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"]{display:block!important;width:100%!important;height:auto!important;max-height:none!important;overflow:visible!important;padding:8px 24px 24px;box-sizing:border-box;background:#fff;border:1px solid #e8edf5;border-radius:16px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .ant-tabs-content{margin-left:0!important;transform:none!important;display:block!important;height:auto!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .ant-tabs-tabpane{width:100%!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .timeline-content{height:auto!important;max-height:none!important;overflow:visible!important;padding:12px 0 0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-layout="true"] .ant-collapse-content-active{height:auto!important}
 .re-audit-empty{margin:12px 0 0;padding:8px 0;color:#8a96a8;font-size:13px;line-height:20px}
 /* Suppress a status card left by an already-open 0.11.7 page during update. */
 .re-audit-overview{display:none!important}
 
 /* Keep report actions inside their card; native review metadata stays readable. */
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc{display:flex;align-items:center;gap:20px;padding:24px 28px;height:auto!important;min-height:100px;box-sizing:border-box}
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc>.state{position:static!important;width:auto!important;height:auto!important;min-width:0;padding:8px 16px;background:#eff5ff!important;color:#2878ff!important;clip-path:none!important;border-radius:0!important;line-height:1.5;flex:0 0 auto}
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc>.state[data-re-audit-failed="true"]{background:#dc2626!important;color:#fff!important}
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc>.state:before,html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc>.state:after{display:none!important}
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc>.content{flex:1;min-width:0;width:auto!important;margin:0!important;padding:0!important}
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc .bottom{overflow-wrap:anywhere}
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc>.button-content{position:static!important;display:flex;flex-wrap:wrap;gap:8px;flex:0 0 auto;margin:0!important}
-html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc .button-content>.button{margin:0!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .ant-tabs-bar{margin:0;border-bottom:1px solid #edf1f7}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .ant-tabs-tab{width:auto!important;text-align:left!important;margin:0!important;padding:12px 4px!important;font-size:16px;font-weight:500;color:#1d2b43}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .ant-tabs-tab+.ant-tabs-tab{margin-left:24px!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .ant-tabs-ink-bar{display:none!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc{display:flex;align-items:center;gap:20px;padding:24px 28px;height:auto!important;min-height:100px;box-sizing:border-box}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc>.state{position:static!important;width:auto!important;height:auto!important;min-width:0;padding:8px 16px;background:#eff5ff!important;color:#2878ff!important;clip-path:none!important;border-radius:0!important;line-height:1.5;flex:0 0 auto}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc>.state[data-re-audit-failed="true"]{background:#dc2626!important;color:#fff!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc>.state:before,html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc>.state:after{display:none!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc>.content{flex:1;min-width:0;width:auto!important;margin:0!important;padding:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc .bottom{overflow-wrap:anywhere}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc>.button-content{position:static!important;display:flex;flex-wrap:wrap;gap:8px;flex:0 0 auto;margin:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc .button-content>.button{margin:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .ant-tabs-bar{margin:0;border-bottom:1px solid #edf1f7}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .ant-tabs-tab{width:auto!important;text-align:left!important;margin:0!important;padding:12px 4px!important;font-size:16px;font-weight:500;color:#1d2b43}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .ant-tabs-tab+.ant-tabs-tab{margin-left:24px!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .ant-tabs-ink-bar{display:none!important}
 /* One rounded outer card; native inner panels have a flat, transparent surface. */
-html[data-re-visual="true"] [data-re-audit-progress="true"] .contain{height:auto!important;max-height:none!important;overflow:visible!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .contain .header{background:transparent!important;padding:12px 0!important;margin:0!important;min-height:0!important;height:auto!important;display:flex;justify-content:flex-end}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .contain .header>div{display:none}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .contain .table{display:none!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .coll-view{padding:0!important;margin:0!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .coll-view .ant-collapse,html[data-re-visual="true"] [data-re-audit-progress="true"] .coll-view .ant-collapse-content,html[data-re-visual="true"] [data-re-audit-progress="true"] .coll-view .ant-collapse-header{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .coll-view .ant-collapse-item{border:0!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .coll-view .ant-checkbox-group{display:block;width:100%!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .coll-view .ant-checkbox-group>div{width:100%!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .col-list{width:100%!important;max-width:none!important;border:0!important;margin:0!important;padding:0!important}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .cell-item.maodianGBCDiv{width:100%!important;max-width:none!important;border:0!important;border-left:3px solid #dc2626!important;border-radius:0!important;background:#fff6f6;padding:12px!important;margin:8px 0 0!important;box-sizing:border-box;display:flex;align-items:flex-start;gap:8px}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .cell-text{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.6}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .cell-btn{flex:0 0 auto;white-space:nowrap}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .timeline-content .lh30{font-size:13px;line-height:24px;color:#8a96a8}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .timeline-content .lh30:first-child{font-size:15px;font-weight:500;color:#1d2b43}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .timeline-content .lh30:empty{display:none}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .timeline-content .chil-sty{display:flex;flex-wrap:wrap;gap:12px;padding:12px 16px!important;margin-top:8px;background:#f7f9fc;border-radius:10px;color:#68768d;font-size:13px}
-html[data-re-visual="true"] [data-re-audit-progress="true"] .timeline-content .ant-timeline-item{padding-bottom:24px}
-@media(max-width:960px){html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc{flex-wrap:wrap;padding:20px;gap:12px}html[data-re-visual="true"] [data-re-report-page="true"]>.top-desc>.button-content{width:100%;justify-content:flex-end}}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .contain{height:auto!important;max-height:none!important;overflow:visible!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .contain .header{background:transparent!important;padding:12px 0!important;margin:0!important;min-height:0!important;height:auto!important;display:flex;justify-content:flex-end}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .contain .header>div{display:none}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .contain .table{display:none!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .coll-view{padding:0!important;margin:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .coll-view .ant-collapse,html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .coll-view .ant-collapse-content,html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .coll-view .ant-collapse-header{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .coll-view .ant-collapse-item{border:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .coll-view .ant-checkbox-group{display:block;width:100%!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .coll-view .ant-checkbox-group>div{width:100%!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .col-list{width:100%!important;max-width:none!important;border:0!important;margin:0!important;padding:0!important}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .cell-item.maodianGBCDiv{width:100%!important;max-width:none!important;border:0!important;border-left:3px solid #dc2626!important;border-radius:0!important;background:#fff6f6;padding:12px!important;margin:8px 0 0!important;box-sizing:border-box;display:flex;align-items:flex-start;gap:8px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .cell-text{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.6}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .cell-btn{flex:0 0 auto;white-space:nowrap}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .timeline-content .lh30{font-size:13px;line-height:24px;color:#8a96a8}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .timeline-content .lh30:first-child{font-size:15px;font-weight:500;color:#1d2b43}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .timeline-content .lh30:empty{display:none}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .timeline-content .chil-sty{display:flex;flex-wrap:wrap;gap:12px;padding:12px 16px!important;margin-top:8px;background:#f7f9fc;border-radius:10px;color:#68768d;font-size:13px}
+html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-audit-progress="true"] .timeline-content .ant-timeline-item{padding-bottom:24px}
+@media(max-width:960px){html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc{flex-wrap:wrap;padding:20px;gap:12px}html[data-re-visual="true"]:not([data-bw-ui="true"]) [data-re-report-page="true"]>.top-desc>.button-content{width:100%;justify-content:flex-end}}
 
 html[data-re-waiting="true"] [data-re-wait-indicator="true"]{opacity:0!important;pointer-events:none!important}
 html[data-re-waiting="true"] .ant-spin-spinning:has([data-re-wait-indicator="true"])>.ant-spin-text{visibility:hidden!important}

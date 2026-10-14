@@ -2,7 +2,7 @@
   'use strict';
   if (location.hostname !== 'wsbx.wbu.edu.cn' || window.__reimbursementEnhancer) return;
   const core = window.ReimbursementEnhancerCore;
-  const status = window.__reimbursementEnhancer = { version: '0.11.9', bankInstances: 0, transferInstances: 0, summaryInstances: 0, compatible: false };
+  const status = window.__reimbursementEnhancer = { version: '0.13.1', bankInstances: 0, transferInstances: 0, summaryInstances: 0, compatible: false };
   let settings = { enabled: true, totals: true, aiGuard: true }, requireModule, vue, controller;
   const definitions = new WeakSet(), instances = new WeakSet(), scannedModules = new WeakSet();
   const stateMarker = Symbol('reimbursement-enhancer');

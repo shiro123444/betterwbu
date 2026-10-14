@@ -1,0 +1,6 @@
+.re-recognition-results{margin:12px 0;padding:16px 20px;border:1px solid #e2e6ec;border-radius:8px;background:#fff;color:#252d3a;font:16px/1.5 system-ui,"Microsoft YaHei",sans-serif}
+.re-recognition-results>strong{font-size:18px}.re-recognition-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 20px;padding:12px 0;border-bottom:1px solid #eef0f3}.re-recognition-row>span{overflow-wrap:anywhere}.re-recognition-row>strong{font-size:16px;white-space:nowrap}.re-recognition-row>small{grid-column:1/-1;color:#687385;font-size:14px}.re-recognition-results button{min-height:40px;margin:12px 12px 0 0;padding:6px 14px;border:1px solid #d9dfe7;border-radius:6px;background:#fff;color:#1765e8;font:inherit;cursor:pointer}
+.re-recognition-results>[role="status"]{max-height:280px;overflow:auto;scrollbar-gutter:stable}
+[data-re-recognition-delayed] *{animation:none!important}
+[data-re-recognition-delayed] .file-image .preview-img{visibility:hidden!important}
+@media(max-width:540px){.re-recognition-row{grid-template-columns:1fr;gap:6px}.re-recognition-results{padding:12px}}

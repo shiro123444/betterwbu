@@ -1,0 +1,54 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
+const {JSDOM}=require('jsdom');const source=name=>fs.readFileSync(__dirname+'/../'+name,'utf8');
+const settle=()=>new Promise(resolve=>setTimeout(resolve,70));
+async function setup(manager=false){
+ const dom=new JSDOM('<!doctype html><html data-re-visual="true"><body><button id="anchor">打开</button><div id="choice"></div><div class="multi-tab"><div class="ant-tabs-bar"></div></div><div class="reimbursementCreate"><div class="ant-collapse-header">基本信息<span class="ant-collapse-extra"></span></div><input id="reason" value="示例事由"><select id="meal"><option>不包食宿</option></select></div><div id="form-view"></div><div id="list-view" hidden></div></body>',{url:'http://127.0.0.1:8767/',runScripts:'outside-only',pretendToBeVisual:true});
+ const w=dom.window;w.innerWidth=1280;w.structuredClone=structuredClone;w.ResizeObserver=class{observe(){}unobserve(){}disconnect(){}};w.matchMedia=()=>({matches:false,addEventListener(){},removeEventListener(){}});w.HTMLElement.prototype.scrollIntoView=function(){};
+ w.postMessage=data=>w.setTimeout(()=>w.dispatchEvent(new w.MessageEvent('message',{data,source:w,origin:w.location.origin})),0);
+ for(const name of ['extension/memory-core-isolated.js','extension/basic-core-http-isolated.js','tests/browser/react/manager-fixture.js','extension/workspace.js'])w.eval(source(name));
+ if(manager)for(const name of ['extension/manager-theme.js','extension/basic-ui-http.js','extension/memory-manager.js','extension/actions.js'])w.eval(source(name));
+ await settle();
+ return {w,d:w.document,ui:w.ReimbursementUI,change(input,value){Object.getOwnPropertyDescriptor(w.HTMLInputElement.prototype,'value').set.call(input,value);input.dispatchEvent(new w.Event('input',{bubbles:true}));},key(input,key){input.dispatchEvent(new w.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}))},close(){w.document[Symbol.for('betterwbu.react-workspace')]?.destroy();w.ReimbursementUI.destroy();w.close()}};
+}
+test('Base UI combobox keeps server order, selects with keyboard and returns the exact record',async()=>{
+ const f=await setup();try{let selected;const records=[{id:'a',name:'示例武汉支行',code:'000000000001'},{id:'b',name:'示例洪山支行',code:'000000000002'}];const choice=f.ui.mountChoice({container:f.d.querySelector('#choice'),label:'开户行',load:async()=>({ok:true,items:records}),onValue:row=>selected=row});
+ const input=f.d.querySelector('[role=combobox]');input.focus();f.change(input,'示例');await new Promise(r=>setTimeout(r,300));await settle();assert.equal(f.d.querySelectorAll('[role=option]').length,2);assert.equal(input.getAttribute('aria-expanded'),'true');f.key(input,'ArrowDown');f.key(input,'Enter');await settle();assert.equal(selected,records[0]);assert.equal(choice.getValue(),records[0]);assert.equal(input.value,'示例武汉支行');assert.equal(input.getAttribute('aria-expanded'),'false');
+ }finally{f.close()}
+});
+test('Base UI async search ignores stale replies and Escape never reopens a dismissed popup',async()=>{
+ const f=await setup();try{const pending=new Map();f.ui.mountChoice({container:f.d.querySelector('#choice'),label:'开户行',load:term=>new Promise(resolve=>pending.set(term,resolve))});const input=f.d.querySelector('[role=combobox]');input.focus();f.change(input,'旧');await new Promise(r=>setTimeout(r,300));f.change(input,'新');await new Promise(r=>setTimeout(r,300));pending.get('新')({ok:true,items:[{id:'new',name:'新支行'}]});await settle();pending.get('旧')({ok:true,items:[{id:'old',name:'旧支行'}]});await settle();assert.equal(f.d.querySelector('[role=option]').textContent,'新支行');f.key(input,'Escape');await settle();assert.equal(input.getAttribute('aria-expanded'),'false');assert.equal(f.d.querySelector('[role=listbox]'),null);
+ }finally{f.close()}
+});
+test('Base UI detail shell preserves extension input nodes, closes and restores focus',async()=>{
+ const f=await setup();try{const content=f.d.createElement('div'),field=f.d.createElement('input');field.value='保留编辑';content.append(field);const anchor=f.d.querySelector('#anchor');anchor.focus();const controller=f.ui.openDetail('住宿明细',content,anchor);await settle();const dialog=f.d.querySelector('.bw-detail-dialog');assert.equal(dialog.getAttribute('role'),'dialog');assert.equal(dialog.querySelector('input'),field);controller.close();await settle();assert.equal(field.value,'保留编辑');assert.equal(f.d.activeElement,anchor);
+ }finally{f.close()}
+});
+test('Base UI success notifications require an actual native success notice and preserve native errors',async()=>{
+ const f=await setup();try{f.d.querySelector('#anchor').click();await settle();assert.equal(f.d.querySelector('.bw-toast'),null);const error=f.d.createElement('div');error.className='ant-message-notice-content';error.textContent='保存失败';f.d.body.append(error);await settle();assert.equal(error.hasAttribute('data-bw-feedback'),false);const notice=f.d.createElement('div');notice.className='ant-message-notice-content';notice.textContent='暂存成功';f.d.body.append(notice);await settle();assert.equal(notice.dataset.bwFeedback,'true');assert.ok(f.d.querySelector('.bw-toast').textContent.includes('暂存成功'));f.ui.notify('收款信息已保存。');await settle();assert.equal(f.d.querySelectorAll('.bw-toast').length,1);assert.ok(f.d.querySelector('.bw-toast').textContent.includes('收款信息已保存。'));
+ }finally{f.close()}
+});
+test('shipped manager uses Base UI panel, keeps real recipient storage and emits success only after save',async()=>{
+ const f=await setup(true);try{const s=f.d.querySelector('[data-re-manager]').shadowRoot;const click=text=>[...s.querySelectorAll('button')].find(n=>n.textContent.trim()===text&&!n.closest('[hidden]')).click();click('信息管理');await settle();assert.equal(s.querySelector('.bw-sidebar').getAttribute('role'),'dialog');click('编辑');await settle();const name=s.querySelector('.editor input');name.value='示例教师乙';s.querySelector('.editor').dispatchEvent(new f.w.Event('submit',{bubbles:true,cancelable:true}));await settle();await settle();assert.equal(s.querySelector('.editor'),null);assert.equal(s.querySelector('.recipient-name').textContent,'示例教师乙');assert.ok(f.d.querySelector('.bw-toast').textContent.includes('收款信息已保存。'));click('×');await settle();assert.equal(f.d.documentElement.dataset.reManagerOpen,'false');
+ }finally{f.close()}
+});
+test('failed recipient save stays editable without a success toast, and manual bank mode still saves complete data',async()=>{
+ const f=await setup(true);try{const s=f.d.querySelector('[data-re-manager]').shadowRoot;const click=text=>[...s.querySelectorAll('button')].find(n=>n.textContent.trim()===text&&!n.closest('[hidden]')).click();click('信息管理');await settle();click('编辑');await settle();const send=f.w.chrome.runtime.sendMessage;f.w.chrome.runtime.sendMessage=async message=>message.type==='memory-save-recipient'?{ok:false}:send(message);s.querySelector('.editor').dispatchEvent(new f.w.Event('submit',{bubbles:true,cancelable:true}));await settle();assert.ok(s.querySelector('.editor'));assert.ok(s.querySelector('.editor [role=status]').textContent.includes('保存失败'));assert.equal(f.d.querySelector('.bw-toast'),null);
+ f.w.chrome.runtime.sendMessage=send;const manual=s.querySelector('.bank-mode input');manual.checked=true;manual.dispatchEvent(new f.w.Event('change'));await settle();const bank=s.querySelector('.editor input[role=textbox]');assert.equal(bank.hidden,false);bank.value='示例银行自填支行';bank.dispatchEvent(new f.w.Event('input'));s.querySelector('.editor').dispatchEvent(new f.w.Event('submit',{bubbles:true,cancelable:true}));await settle();await settle();assert.equal(s.querySelector('.editor'),null);assert.ok(s.querySelector('.record').textContent.includes('示例银行自填支行'));
+ }finally{f.close()}
+});
+test('Base UI confirmation Escape cancels without invoking the operation and preserves content',async()=>{
+ const f=await setup();try{const anchor=f.d.querySelector('#anchor');anchor.focus();let answer;const confirmation=f.ui.confirm('覆盖填充','替换所选信息？').then(value=>answer=value);await settle();const close=f.d.querySelector('.bw-detail-dialog button');close.focus();f.key(close,'Escape');await confirmation;await settle();assert.equal(answer,false);assert.equal(f.d.activeElement,anchor);
+ }finally{f.close()}
+});
+test('saved recipient picker filters locally without editing the native anchor and selects the whole record',async()=>{
+ const f=await setup();try{const anchor=f.d.createElement('input');anchor.value='原账户名称';f.d.body.append(anchor);const entries=[{value:'record-a',label:'示例教师甲 · 示例银行'},{value:'record-b',label:'示例教师乙 · 示例银行'}];let selected;const picker=f.ui.openRecipientPicker({anchor,entries,onValue:entry=>selected=entry});await settle();const input=f.d.querySelector('[aria-label=搜索收款人]');f.change(input,'教师乙');await settle();assert.equal(anchor.value,'原账户名称');assert.equal(f.d.querySelectorAll('[role=option]').length,1);f.key(input,'ArrowDown');f.key(input,'Enter');await settle();assert.equal(selected,entries[1]);assert.equal(picker.contains(input),true);
+ }finally{f.close()}
+});
+test('native recipient adapter searches saved records, fills through its guarded bridge and does not reopen after focus return',async()=>{
+ const f=await setup();try{const anchor=f.d.createElement('input');anchor.id='recipient-demo';anchor.value='示例教师';anchor.dataset.reMemoryId='demo-recipient-field';anchor.dataset.reMemoryKey='bankAccountName';const bank=f.d.createElement('span');bank.id='recipient-demo-bank';f.d.body.append(anchor,bank);f.w.eval(source('extension/memory.js'));await settle();anchor.focus();await settle();const search=f.d.querySelector('[aria-label=搜索收款人]');assert.ok(search);await new Promise(r=>setTimeout(r,220));assert.ok(search.isConnected);f.key(search,'ArrowDown');f.key(search,'Enter');await settle();await settle();assert.equal(anchor.value,'示例教师');assert.equal(bank.textContent,'示例银行武汉支行');assert.equal(f.d.querySelector('.bw-recipient-popup'),null);
+ }finally{f.close()}
+});
+test('Escape on a preselected bank first dismisses the list then closes the panel without clearing saved data',async()=>{
+ const f=await setup(true);try{const s=f.d.querySelector('[data-re-manager]').shadowRoot;const click=text=>[...s.querySelectorAll('button')].find(n=>n.textContent.trim()===text&&!n.closest('[hidden]')).click();click('信息管理');await settle();click('编辑');await settle();const bank=s.querySelector('.editor .bw-choice [role=combobox]');bank.focus();f.key(bank,'ArrowDown');await settle();f.key(bank,'Escape');await settle();assert.equal(f.d.documentElement.dataset.reManagerOpen,'true');assert.equal(bank.value,'示例银行武汉支行');f.key(bank,'Escape');await settle();assert.equal(f.d.documentElement.dataset.reManagerOpen,'false');assert.equal(s.querySelector('.recipient-name').textContent,'示例教师');
+ }finally{f.close()}
+});

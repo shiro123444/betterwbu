@@ -7,7 +7,7 @@
  const records=new Map(),categories=new Map(),hiddenExports=new Map(),managerIcons=new Map();let settings={enabled:true,visual:true},queued=false;
  const observedShadows=new WeakSet();
  function schedule(){if(!queued){queued=true;requestAnimationFrame(()=>{queued=false;update()})}}
- function title(n){const h=n.closest('.collapse-box')?.querySelector('.ant-collapse-header');return [...h?.childNodes||[]].find(x=>x.nodeType===3&&x.textContent.trim())?.textContent.trim()||''}
+ function title(n){const h=n.closest('.collapse-box')?.querySelector('.ant-collapse-header');return [...h?.childNodes||[]].find(x=>(x.nodeType===3||x.dataset?.bwNativeTitle==='true')&&x.textContent.trim())?.textContent.trim()||''}
  function label(icon,section,n){
   if(icon==='delete')return {text:'删除选中',tip:'删除已勾选的行',kind:'trash',style:'secondary'};
   if(icon==='copy')return {text:'复制末行',tip:'复制表格的最后一行，不是已勾选的行',kind:'copy',style:'secondary'};

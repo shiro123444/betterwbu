@@ -1,8 +1,9 @@
 (function (root, factory) {
-  const api = factory(typeof module === 'object' && module.exports ? require('./core.js') : root.ReimbursementEnhancerCore);
+  const api = factory(typeof module === 'object' && module.exports ? require('./core.js') : root.ReimbursementEnhancerCore,
+    typeof module === 'object' && module.exports ? require('./invoice-associations.js') : root.ReimbursementInvoiceAssociations);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.ReimbursementInvoiceCore = api;
-})(typeof window === 'object' ? window : {}, function (money) {
+})(typeof window === 'object' ? window : {}, function (money, associations) {
   'use strict';
   const categories = ['城市间交通费','住宿','过路过桥','改签、退票费','交通意外险','燃油费','车辆租赁'];
   function identifiers(bill) { return ['barcode','dataId','id'].map(k => bill?.[k]).filter(v => v != null && String(v).trim()).map(String); }
@@ -99,7 +100,7 @@
     return {positive,negative,net,positiveCount,negativeCount};
   }
   function rowValues(row, allowed) {
-    const d = row.bill?.billData || {}, value = row.amountCents / 100, tax = amount(d.totalTax);
+    const d = row.bill?.billData || {}, value = row.amountCents / 100, tax = row.kind==='invoice' ? row.taxCents : amount(d.totalTax);
     const values = {BSX070203:value, BSX070207:value, BSX070303:value, BSX070306:value, BSX070110:'由票据生成：' + row.title};
     if (tax != null && tax >= 0 && tax <= row.amountCents) {
       for (const key of ['BSX070202','BSX070206','BSX070302','BSX070305']) values[key] = tax / 100;
@@ -170,5 +171,5 @@
     }
     return {rows,amount:total(rows),days,people:people.length};
   }
-  return {categories, identifiers, identity, amount, classify, plan, total, balance, rowValues, replacementCategories, projection, allowances, stayPeriod, calendarDay, policyUrl};
+  return {categories, identifiers, identity, amount, classify, plan, total, balance, rowValues, replacementCategories, projection, allowances, stayPeriod, calendarDay, policyUrl, associations};
 });
