@@ -190,6 +190,18 @@ html[data-bw-ui="true"][data-re-wallet-picker="true"] .ant-btn {min-height:42px;
  [data-bw-workspace] .ant-table-content {width:100%!important;max-width:100%!important;overflow-x:auto!important;overscroll-behavior-x:contain;scrollbar-width:thin}
  [data-bw-workspace] .ant-table-content>.ant-table {max-width:none!important}
 }
+/* Expanding the native sidebar restores both its labels and the custom icons.
+   Support Ant Design's collapsed state and the synthetic preview toggle. */
+@media(max-width:900px){
+ html[data-bw-ui="true"] .ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-submenu-title,
+ html[data-bw-ui="true"] body[data-nav-expanded="true"] .ant-layout-sider .ant-menu-submenu-title {justify-content:flex-start!important;gap:10px!important;padding:6px 8px!important;font-size:15px!important;line-height:24px!important;white-space:normal!important;overflow:visible}
+ html[data-bw-ui="true"] .ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-submenu-title:after,
+ html[data-bw-ui="true"] body[data-nav-expanded="true"] .ant-layout-sider .ant-menu-submenu-title:after {display:block!important}
+ html[data-bw-ui="true"] .ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-item a,
+ html[data-bw-ui="true"] body[data-nav-expanded="true"] .ant-layout-sider .ant-menu-item a {justify-content:flex-start!important;gap:10px!important;padding:0 4px!important;font-size:15px!important;line-height:24px!important;white-space:normal!important;overflow:visible!important;overflow-wrap:anywhere!important}
+ html[data-bw-ui="true"] .ant-layout-sider:not(.ant-layout-sider-collapsed) .ant-menu-item,
+ html[data-bw-ui="true"] body[data-nav-expanded="true"] .ant-layout-sider .ant-menu-item {padding:5px 8px!important}
+}
 @media(max-width:600px){
  html[data-bw-ui="true"] .re-invoice-dialog {padding:16px!important}
  .bw-section-amount {font-size:18px}.bw-heading {gap:8px}

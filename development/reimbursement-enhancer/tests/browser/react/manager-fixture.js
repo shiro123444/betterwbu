@@ -51,8 +51,11 @@
  document.addEventListener('DOMContentLoaded',()=>{
   document.querySelector('#manager-toggle')?.remove(); // The shipped manager supplies its real trigger.
   const menuToggle=document.querySelector('.ant-layout-sider-trigger');
-  function menu(open){document.body.dataset.navExpanded=String(open);menuToggle?.setAttribute('aria-expanded',String(open));menuToggle?.setAttribute('aria-label',open?'收起系统导航':'展开系统导航')}
+  const sider=document.querySelector('.ant-layout-sider');
+  function menu(open){document.body.dataset.navExpanded=String(open);sider?.classList.toggle('ant-layout-sider-collapsed',!open&&innerWidth<=900);menuToggle?.setAttribute('aria-expanded',String(open));menuToggle?.setAttribute('aria-label',open?'收起系统导航':'展开系统导航')}
+  menu(false);
   menuToggle?.addEventListener('click',()=>menu(document.body.dataset.navExpanded!=='true'));
+  window.addEventListener('resize',()=>menu(document.body.dataset.navExpanded==='true'));
   document.querySelector('.ant-layout-sider')?.addEventListener('keydown',e=>{if(e.key==='Escape'){menu(false);menuToggle?.focus()}});
   for(const link of document.querySelectorAll('[data-fixture-route]'))link.addEventListener('click',event=>{
    event.preventDefault();const view=link.dataset.fixtureRoute;document.body.dataset.fixtureView=view;
