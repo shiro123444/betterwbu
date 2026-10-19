@@ -7,7 +7,7 @@ function SidebarButton({record, collapsed, target, disabled}) {
     return()=>record.sider.removeAttribute('data-bw-sidebar-ready');
   },[record]);
   const label=collapsed?'展开侧栏':'收起侧栏';
-  return <button type="button" className="bw-button bw-icon-button bw-sidebar-toggle"
+  return <button type="button" className="bw-button bw-sidebar-toggle"
     aria-label={label} title={label} aria-expanded={!collapsed} aria-controls={record.sider.id}
     disabled={disabled} onClick={event=>{
       event.preventDefault();event.stopPropagation();
@@ -17,6 +17,7 @@ function SidebarButton({record, collapsed, target, disabled}) {
       <rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/>
       <path d={collapsed?'m13 9 3 3-3 3':'m16 9-3 3 3 3'}/>
     </svg>
+    <span className="bw-sidebar-toggle-label">{label}</span>
   </button>;
 }
 

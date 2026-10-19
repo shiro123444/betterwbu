@@ -35,6 +35,12 @@
         if (environment?.enabled?.() !== false && /\/reimbursement\/(?:save|commit|ai|ai-again)(?:\?|$)/.test(String(args[0])) && String(data?.id || core.id(data?.reimbData)) === core.id(current) && core.id(current)) {
           const issue = core.requestIssue(current, data);
           if (issue) return Promise.resolve({ success: false, code: "ENHANCER_TICKETS_NOT_READY", message: issue });
+          // Incomplete drafts must remain saveable. Only the explicit native
+          // submission is stopped; never repair amounts or associations here.
+          if (/\/reimbursement\/commit(?:\?|$)/.test(String(args[0])) && routeId() === core.id(current) && core.eligible(current)) {
+            const issues = core.expenseIssues(data.reimbData || current);
+            if (issues.length) return Promise.resolve({ success:false, code:"ENHANCER_EXPENSES_NOT_READY", message:"明细预检未通过：\n" + issues.map(i => i.message).join("\n") });
+          }
         }
         return post.apply(this, args);
       };
@@ -79,7 +85,9 @@
     const [response, audit] = await Promise.all([environment.readDraft(currentId), Promise.resolve(environment.readAudit?.(currentId)).catch(() => null)]);
     if (routeId() !== currentId || scope() !== user) throw Error("当前用户或单据已切换，已丢弃旧结果");
     if (String(response?.data?.id || "") !== currentId) throw Error("后台返回了不同单据，已停止");
-    return core.serverReport(response, audit, printedTotal(response.data.reimbursementNo));
+    const report = core.serverReport(response, audit, printedTotal(response.data.reimbursementNo));
+    report.currentDetailIssues = core.expenseIssues(form());
+    return report;
   }
   async function generate(snapshot) {
     const issues = core.generationIssues(form(), environment?.bills?.() || []);

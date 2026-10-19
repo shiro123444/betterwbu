@@ -20,13 +20,15 @@
     requests.delete(event.data.id);
     event.data.ok ? entry.resolve(event.data) : entry.reject(Object.assign(Error(event.data.error || "操作失败"), { generationFailure: !!event.data.generationFailure }));
   });
-  window.ReimbursementFillCompatUI = { mount({ container, node, button, notify }) {
+  window.ReimbursementFillCompatUI = { mount({ container, node, button, notify, mode = "all" }) {
     const section = node("fieldset", null, "settings-group");
-    section.append(node("legend", "填报兼容"));
+    section.append(node("legend", mode === "inspect" ? "单据检查" : "填报操作"));
     const status = node("p", null, "muted");
     status.setAttribute("role", "status");
     const start = button("一键同步填报", run), restore = button("恢复核对明细", recover), refresh = button("重新检查", load), checkButton = button("检查当前单据", check), reportArea = node("div", null, "fill-compat-report"), actions = node("div", null, "actions");
     start.className = "primary";
+    start.hidden = restore.hidden = refresh.hidden = mode === "inspect";
+    checkButton.hidden = mode === "sync";
     reportArea.setAttribute("role", "status");
     start.disabled = restore.disabled = true;
     actions.append(start, restore, refresh, checkButton);
@@ -39,6 +41,12 @@
       const lines = [(report.stateName || "后台状态 " + report.state) + " · " + money(report.total), "填报记录：" + (report.fillRecorded ? "已记录" : "未记录") + " · 生成结果：" + (generationOutcome?.success === true ? "成功" : generationOutcome?.success === false ? "失败" : "未确认"), "费用 " + money(report.expenseTotal) + " · 实收 " + money(report.receiptTotal), report.auditKnown ? "稽核：" + report.violations + " 条违规，" + report.warnings + " 条提醒" : "稽核结果尚未读取", "打印金额：" + money(report.printTotal)];
       for (const text of lines) reportArea.append(node("p", text, "muted"));
       for (const text of report.issues || []) reportArea.append(node("p", text, "fill-compat-issue"));
+      for (const [title,issues] of [["当前页面明细预检（含未保存修改）",report.currentDetailIssues],["后台已保存明细预检",report.detailIssues]]) {
+        if (!Array.isArray(issues)) continue;
+        reportArea.append(node("p",title + "：" + (issues.length ? issues.length + " 项待核对" : "未发现已知问题"),"muted"));
+        for (const issue of issues) reportArea.append(node("p",issue.message,"fill-compat-issue"));
+      }
+      if (Array.isArray(report.detailIssues)) reportArea.append(node("p","预检检查票据关联和补贴计算依据；最终有效金额及稽核结果以学校系统为准。","muted"));
       checkedDraft = report.draftId || "";
       checkedKey = String(report.state) + "|" + String(report.total);
     }
@@ -74,8 +82,10 @@
           checkedKey = checkedDraft = "";
         }
         start.textContent = state.fillRecorded ? "检查填报状态" : "一键同步填报";
-        start.hidden = refresh.hidden = !!state.submitted;
-        restore.hidden = !snapshot || !state.eligible;
+        start.hidden = mode === "inspect" || !!state.submitted;
+        refresh.hidden = mode === "inspect" || !!state.submitted;
+        restore.hidden = mode === "inspect" || !snapshot || !state.eligible;
+        checkButton.hidden = mode === "sync";
         start.disabled = !state.eligible || !state.available || state.busy || state.pending;
         restore.disabled = !state.eligible || !snapshot || state.busy || state.pending || !state.fillRecorded;
         status.textContent = state.submitted ? "已进入后续流程，仅检查，不修改。" : !state.eligible ? "请打开待提交草稿。" : state.pending ? "请完成原生窗口，再重新检查。" : state.fillRecorded ? "后台已记录填报，不再重复生成。提交仍由原系统校验。" : snapshot ? "核对结果已备份。" : "自动备份、填报、恢复并暂存，不会正式提交。";
@@ -146,6 +156,6 @@
         await load();
       }
     }
-    return { load };
+    return { load, check };
   } };
 })();

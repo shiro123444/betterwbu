@@ -58,6 +58,32 @@ test('receipt checks stay within the current draft and respect the optimization 
  payload.id='draft-a';f.environment.enabled=()=>false;
  assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/save',payload)).success,true);
 });
+
+test('expense preflight blocks native submission while preserving incomplete draft saves and generation',async()=>{
+ const f=bridgeFixture();f.form.formId='c3771358d145490f9e363790c0519fde';
+ f.form.activitys=[{activityMetaName:'常规差旅',behaviors:[{behaviorMetaName:'城市间交通费',behaviorDetail:[{BSX070306:1296,BSX0709:[]}]}]}];
+ const payload={id:'draft-a',billVOList:structuredClone(f.form.billVOList),reimbData:structuredClone(f.form)},before=structuredClone(payload);
+ const result=await f.http.post('/reimburse-service/api/v1/reimbursement/commit',payload);
+ assert.equal(result.code,'ENHANCER_EXPENSES_NOT_READY');assert.match(result.message,/未关联有效发票/);assert.deepEqual(payload,before);
+ for(const action of ['save','ai','ai-again'])assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/'+action,payload)).success,true);
+ assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/commit',{id:'draft-a'})).code,'ENHANCER_EXPENSES_NOT_READY');
+ f.environment.enabled=()=>false;assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/commit',payload)).success,true);
+});
+
+test('checking a draft distinguishes unsaved page issues from saved backend issues',async()=>{
+ const f=bridgeFixture();f.form.formId='c3771358d145490f9e363790c0519fde';
+ const saved=structuredClone(f.form);saved.activitys=[];
+ f.environment.readDraft=async id=>({success:true,data:{id,state:2,reimbData:saved}});
+ f.form.activitys=[{behaviors:[{behaviorMetaName:'改签、退票费',behaviorDetail:[{BSX070306:2}]}]}];
+ const result=await f.send('server-status');assert.deepEqual(result.report.detailIssues,[]);assert.equal(result.report.currentDetailIssues[0].code,'invoice-missing');assert.equal(f.calls.length,0);
+});
+
+test('report totals count native blank placeholder rows as zero without hiding invalid amounts',()=>{
+ const f=draft();f.activitys[0].behaviors[0].behaviorDetail.push({BSX070306:' '},{});
+ const response={success:true,data:{id:'draft-a',totalAmount:'103.90',reimbData:f}};
+ assert.equal(core.serverReport(response,null).expenseTotal,10390);
+ f.activitys[0].behaviors[0].behaviorDetail[1].BSX070306='invalid';assert.equal(core.serverReport(response,null).expenseTotal,null);
+});
 test('incomplete multipart tickets stop save, submission and both generation endpoints without changing the source',async()=>{
  const f=bridgeFixture(),payload={id:'draft-a',billVOList:[{barcode:'group',dataType:5,subBillCards:[]}],reimbData:structuredClone(f.form)},before=structuredClone(payload);
  for(const action of ['save','commit','ai','ai-again'])assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/'+action,payload)).code,'ENHANCER_TICKETS_NOT_READY');
@@ -174,6 +200,13 @@ test('an already submitted backend report produces a read-only result even if th
  const f=uiFixture(undefined,{state:9,stateName:'待审批',submitted:true,fillRecorded:true,auditKnown:true,violations:0,warnings:7,printTotal:0,issues:['打印报销单金额与后台总额不一致']});await f.start();
  assert.match(f.w.document.body.textContent,/待审批/);assert.match(f.w.document.body.textContent,/0 条违规，7 条提醒/);assert.match(f.w.document.body.textContent,/打印报销单金额与后台总额不一致/);
  for(const action of ['capture','run','finish','restore','fill-guard-begin'])assert.equal(f.trace.includes(action),false);f.w.close();
+});
+
+test('check report renders current and saved detail issues separately with actionable row labels',async()=>{
+ const f=uiFixture(undefined,{currentDetailIssues:[{code:'invoice-missing',message:'常规差旅 / 城市间交通费 / 第1行：未关联有效发票'}],detailIssues:[]});
+ await f.ui.load();f.w.document.querySelectorAll('button')[3].click();for(let i=0;i<8;i++)await new Promise(setImmediate);
+ const text=f.w.document.body.textContent;
+ assert.match(text,/当前页面明细预检（含未保存修改）：1 项待核对/);assert.match(text,/后台已保存明细预检：未发现已知问题/);assert.match(text,/城市间交通费 \/ 第1行：未关联有效发票/);assert.equal(f.trace.includes('capture'),false);f.w.close();
 });
 test('submitted form checks are read-only, and navigating to the list blocks stale-form mutations',async()=>{
  const f=bridgeFixture();f.form.state=9;f.form.aiFlag='true';const original=structuredClone(f.form),result=await f.send('server-status');assert.equal(result.ok,true);assert.equal(result.report.state,9);assert.equal(result.report.fillRecorded,true);assert.equal(result.report.auditKnown,false);assert.deepEqual(f.form,original);assert.equal(f.calls.length,0);

@@ -243,6 +243,7 @@
     for(const [input,key] of [[startDate,'startManual'],[endDate,'endManual']])for(const event of ['input','change'])input.addEventListener(event,()=>{preview.allowance[key]=true});
     const regionLabel=el('label','出差地区'),region=el('select');region.setAttribute('aria-label','出差地区');
     for(const [value,label] of [['outside','省外普通地区'],['hubei','湖北省内（武汉以外）'],['special','青海、西藏、新疆'],['wuhan','武汉市内']]){const o=el('option',label);o.value=value;region.append(o)}region.value=saved.region || 'outside';regionLabel.append(region);controls.append(regionLabel);
+    controls.append(el('p','这里的出差地区仅用于补贴估算，不能代替原生补贴地。生成后请逐行选择补贴地，等待标准、补贴天数计算，再用“填报助手 → 状态与预检”核对。'));
     const mealExcluded=field('不发餐补天数','number',saved.mealExcluded ?? '0'),transportExcluded=field('不发交通补贴天数','number',saved.transportExcluded ?? '0');
     const dateHint=el('div',stay.start?stay.sources.join('、')+' · '+stay.start+' 至 '+stay.end:stay.reason || '未识别到入住、离店日期，请填写');dateHint.className='re-allowance-date-hint';
     const useDates=el('button','使用住宿日期');useDates.type='button';useDates.hidden=!stay.start;useDates.addEventListener('click',()=>{startDate.value=stay.start;endDate.value=stay.end;preview.allowance.startManual=false;preview.allowance.endManual=false;refresh()});dateHint.append(useDates);

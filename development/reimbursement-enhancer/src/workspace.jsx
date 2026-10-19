@@ -5,6 +5,7 @@ import {Menu} from '@base-ui/react/menu';
 import './ui-runtime.jsx';
 import {createWorkspaceModel} from './workspace-model.cjs';
 import {createSidebarToggle} from './sidebar-toggle.jsx';
+import {createFillReview} from './fill-review.jsx';
 
 const paths = {
   chevron:'m6 9 6 6 6-6', more:'M5 12h.01M12 12h.01M19 12h.01',
@@ -56,6 +57,7 @@ const marker=Symbol.for('betterwbu.react-workspace');
 if(!document[marker]) {
   const model=createWorkspaceModel(document);
   const sidebar=createSidebarToggle(document);
+  const fillReview=createFillReview(document);
   let reactRoot, mount, navigation, nativeRoot, frame, stopped=false;
   function tick(){
     frame=null;if(stopped)return;
@@ -72,9 +74,9 @@ if(!document[marker]) {
   const observer=new MutationObserver(records=>{
     if(records.some(r=>!r.target.closest?.('[data-bw-owned]') || r.type==='attributes'))schedule();
   });
-  async function configure(){try{const s=await chrome.storage.local.get({enabled:true,visual:true});model.enable(s.enabled&&s.visual);sidebar.enable(s.enabled&&s.visual);schedule()}catch{model.enable(false);sidebar.enable(false);schedule()}}
-  function start(){observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','aria-expanded','aria-disabled','disabled','data-re-visual']});sidebar.start();configure();schedule()}
-  document[marker]={model,refresh:tick,destroy(){stopped=true;observer.disconnect();if(frame)cancelAnimationFrame(frame);reactRoot?.unmount();mount?.remove();navigation?.remove();sidebar.destroy();model.destroy()}};
+  async function configure(){try{const s=await chrome.storage.local.get({enabled:true,visual:true});model.enable(s.enabled&&s.visual);sidebar.enable(s.enabled&&s.visual);fillReview.enable(s.enabled);schedule()}catch{model.enable(false);sidebar.enable(false);fillReview.enable(false);schedule()}}
+  function start(){observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','aria-expanded','aria-disabled','disabled','data-re-visual']});sidebar.start();fillReview.start();configure();schedule()}
+  document[marker]={model,refresh:tick,destroy(){stopped=true;observer.disconnect();if(frame)cancelAnimationFrame(frame);reactRoot?.unmount();mount?.remove();navigation?.remove();sidebar.destroy();fillReview.destroy();model.destroy()}};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
   chrome.storage.onChanged.addListener(configure);window.addEventListener('hashchange',schedule);
 }
