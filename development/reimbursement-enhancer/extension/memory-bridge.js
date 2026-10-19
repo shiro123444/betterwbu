@@ -1,6 +1,6 @@
 (() => {
  'use strict';
- if(location.hostname!=='wsbx.wbu.edu.cn'||!location.pathname.startsWith('/workbench-web/'))return;
+ if(!window.ReimbursementSite.workbench(location))return;
  const fields=new Map(),registered=new WeakMap(),rowVersions=new WeakMap();let serial=0;
  const core=window.ReimbursementMemoryCore;
  function identity(){try{const u=JSON.parse(localStorage.getItem('userInfo')||'null');return u?.id?String(u.groupId||'')+'|'+String(u.id):null}catch{return null}}
@@ -52,7 +52,7 @@
  },prune(){for(const [id,field]of fields)if(!field.node.isConnected)fields.delete(id)}};
  function reply(id,data){window.postMessage({type:'reimbursement-memory-reply',id,...data},location.origin)}
  window.addEventListener('message',async event=>{
-  if(event.source!==window||event.origin!==location.origin||event.data?.type!=='reimbursement-memory-request')return;
+  if(event.source!==window||!window.ReimbursementSite.messageOrigin(event.origin,location)||event.data?.type!=='reimbursement-memory-request')return;
   const {id,action,fieldId,entry,expected,expectedScope,expectedContext}=event.data;
   if(typeof id!=='string'||id.length>100)return;
   if(typeof action==='string'&&action.startsWith('basic-'))return;

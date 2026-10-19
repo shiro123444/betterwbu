@@ -356,7 +356,7 @@
     prepare, apply, readBills:richBills
   };
   window.addEventListener?.('message', event=>{
-    if(event.origin !== location.origin)return;
+    if(!window.ReimbursementSite.messageOrigin(event.origin,location))return;
     const picker=document.querySelector('iframe.iframe-box'),details=document.querySelector('iframe.iframe-box1');
     const fromPicker=!!picker&&event.source===picker.contentWindow,fromDetails=!!details&&event.source===details.contentWindow;
     if(!fromPicker&&!fromDetails)return;

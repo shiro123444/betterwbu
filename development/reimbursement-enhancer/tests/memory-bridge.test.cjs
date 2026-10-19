@@ -1,18 +1,33 @@
 const test=require('node:test'),assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
 const core=require('../extension/memory-core.js');
-function fixture(key='bankAccount'){
+function fixture(key='bankAccount',origin='http://wsbx.wbu.edu.cn'){
  let listener,user='teacher-a';const replies=[];
- const window={ReimbursementMemoryCore:core,addEventListener:(type,f)=>listener=f,postMessage:r=>replies.push(r)};
- const localStorage={getItem:()=>JSON.stringify({id:user,groupId:'school'})},location={hostname:'wsbx.wbu.edu.cn',pathname:'/workbench-web/',origin:'http://wsbx.wbu.edu.cn'};
+ const window={ReimbursementSite:require("../extension/site.js"),ReimbursementMemoryCore:core,addEventListener:(type,f)=>listener=f,postMessage:r=>replies.push(r)};
+ const localStorage={getItem:()=>JSON.stringify({id:user,groupId:'school'})},location={hostname:new URL(origin).hostname,pathname:'/workbench-web/',origin};
  vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/memory-bridge.js','utf8'),{window,localStorage,location});
  const model={bankAccountName:'Recipient',branchBankName:'bank-id',bankAccount:'',branchBankName_object:[{id:'bank-id',branch_bank_name:'Full bank',branch_bank_code:'123'}]};
  const input={nodeType:1,disabled:false,readOnly:false,isConnected:true,dataset:{},matches:()=>true};
  const instance={props:{componentInfo:{key,title:key},formProps:model},subTree:{el:input},setupState:{onSelect:(id,row)=>{model.branchBankName=id;model.branchBankName_object=[row]}}};
  window.ReimbursementMemoryBridge.getForm=()=>({formId:'travel'});window.ReimbursementMemoryBridge.register(instance);
- const send=async(action,extra={})=>{await listener({source:window,origin:'http://wsbx.wbu.edu.cn',data:{type:'reimbursement-memory-request',id:'test',action,fieldId:input.dataset.reMemoryId,...extra}});return replies.at(-1)};
+ const send=async(action,extra={},eventOrigin=origin,source=window)=>{const before=replies.length;await listener({source,origin:eventOrigin,data:{type:'reimbursement-memory-request',id:'test',action,fieldId:input.dataset.reMemoryId,...extra}});return replies.length>before?replies.at(-1):undefined};
  function add(key){const node={...input,dataset:{}},instance={props:{componentInfo:{key,title:key},formProps:model},subTree:{el:node},setupState:{onSelect:(id,row)=>{model.branchBankName=id;model.branchBankName_object=[row]}}};window.ReimbursementMemoryBridge.register(instance);return {node,instance}}
  return {model,window,send,input,add,location,changeUser:()=>user='teacher-b'};
 }
+test('WebVPN memory bridge identifies fields and applies the current user selection',async()=>{
+ const f=fixture('bankAccount','http://wsbx-wbu-edu-cn.webvpn.wbu.edu.cn:8118');
+ const d=(await f.send('describe')).descriptor;assert.ok(d);
+ const r=await f.send('apply',{entry:{value:'1234567890123456'},expected:d.value,expectedScope:d.scope,expectedContext:d.context});
+ assert.equal(r.ok,true);assert.equal(f.model.bankAccount,'1234567890123456');
+});
+
+test('WebVPN accepts the upstream origin restored by Sangfor, but still rejects foreign senders',async()=>{
+ const f=fixture('bankAccount','http://wsbx-wbu-edu-cn.webvpn.wbu.edu.cn:8118');
+ assert.ok((await f.send('describe',{},'http://wsbx.wbu.edu.cn')).descriptor);
+ assert.equal(await f.send('describe',{},'https://foreign.example'),undefined);
+ assert.equal(await f.send('describe',{},'http://wsbx.wbu.edu.cn',{}),undefined);
+ const direct=fixture();assert.equal(await direct.send('describe',{},'http://wsbx-wbu-edu-cn.webvpn.wbu.edu.cn:8118'),undefined);
+});
+
 test('memory application requires unchanged user, recipient, bank and current value',async()=>{
  const f=fixture();const d=(await f.send('describe')).descriptor;
  const choose={entry:{value:'1234567890123456'},expected:d.value,expectedScope:d.scope,expectedContext:d.context};

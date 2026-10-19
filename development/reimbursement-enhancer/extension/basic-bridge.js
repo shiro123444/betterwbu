@@ -38,7 +38,7 @@
  }
  window.ReimbursementBasicBridge={register(i){const key=i.props?.componentInfo?.key,form=memory()?.getForm?.();if(!Object.hasOwn(core.fields,key)||i.props.formProps!==form)return;if(core.fields[key].text?i.type?.name!=='textareaCmpt':i.type?.name!=='selectSingleCmpt')return;instances.set(key,i);if(form!==lastForm){lastForm=form;window.postMessage({type:'reimbursement-basic-ready'},location.origin)}},apply};
  window.addEventListener('message',async e=>{
-  if(e.source!==window||e.origin!==location.origin||e.data?.type!=='reimbursement-basic-request'||typeof e.data.id!=='string')return;
+  if(e.source!==window||!window.ReimbursementSite.messageOrigin(e.origin,location)||e.data?.type!=='reimbursement-basic-request'||typeof e.data.id!=='string')return;
   const {id,action,expectedScope}=e.data;const reply=data=>window.postMessage({type:'reimbursement-memory-reply',id,...data},location.origin);
   if(!action?.startsWith('basic-'))return;
   try{

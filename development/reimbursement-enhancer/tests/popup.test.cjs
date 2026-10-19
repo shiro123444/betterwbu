@@ -9,7 +9,7 @@ function setup(options={}){
   sendMessage:async(id,message,opts)=>{messages.push({id,message,opts});return message.type==='info-manager-status'?{version:'0.11.5',ready:true}:{ok:true}},
   ...options
  }};
- vm.runInNewContext(source,{document:{getElementById:id=>elements[id]},chrome,window:{close(){closed++}},setTimeout(fn){timers.set(++nextTimer,fn);return nextTimer},clearTimeout(id){timers.delete(id)}});
+ vm.runInNewContext(source,{document:{getElementById:id=>elements[id]},chrome,window:{ReimbursementSite:require("../extension/site.js"),close(){closed++}},setTimeout(fn){timers.set(++nextTimer,fn);return nextTimer},clearTimeout(id){timers.delete(id)}});
  return {elements,messages,timers,chrome,closed:()=>closed};
 }
 test('popup checks the top-level workbench without opening it, and closes only after a successful explicit open',async()=>{
@@ -26,6 +26,12 @@ test('popup refuses unsupported sites, missing pages, mismatched versions and in
   {options:{sendMessage:async()=>({version:'0.11.5',ready:false})},text:/尚未初始化完成/}
  ];
  for(const row of cases){const p=setup(row.options);await settle();assert.match(p.elements.status.textContent,row.text);assert.equal(p.elements.open.disabled,true);assert.equal(p.elements.retry.disabled,false);assert.equal(p.closed(),0);assert.ok(p.messages.every(m=>m.message.type==='info-manager-status'))}
+});
+
+test('popup reaches the top-level WebVPN workbench through its explicit port',async()=>{
+ const p=setup({query:async()=>[{id:9,url:'http://wsbx-wbu-edu-cn.webvpn.wbu.edu.cn:8118/workbench-web/#/workbench'}]});
+ await settle();assert.equal(p.elements.open.disabled,false);assert.equal(p.messages[0].opts.frameId,0);
+ await p.elements.open.click();assert.equal(p.closed(),1);
 });
 test('query and connection errors restore retry, which can recover on a newly available page',async()=>{
  for(const failing of ['query','sendMessage']){

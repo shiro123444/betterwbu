@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),vm=require(
 test('AI guard blocks only two generation endpoints and can be disabled',async()=>{
  let listener,rules,settings={enabled:true,aiGuard:true};
  const chrome={runtime:{onMessage:{addListener:f=>listener=f}},storage:{local:{get:async()=>settings}},declarativeNetRequest:{updateSessionRules:async r=>{rules=r}},tabs:{onRemoved:{addListener:()=>{}}}};
- vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/background.js','utf8'),{chrome});
+ vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/background.js','utf8'),{chrome,ReimbursementSite:require("../extension/site.js")});
  const call=()=>new Promise(resolve=>listener({type:'configure-guard'},{tab:{id:42},url:'http://wsbx.wbu.edu.cn/workbench-web/'},resolve));
  assert.equal((await call()).ok,true);assert.equal(rules.addRules.length,1);
  const regex=new RegExp(rules.addRules[0].condition.regexFilter);

@@ -86,7 +86,7 @@
   }
   function schedule() { if (!queued) { queued = true; requestAnimationFrame(scan); } }
   window.addEventListener('message', e => {
-    if (e.origin !== origin) return;
+    if (!window.ReimbursementSite.messageOrigin(e.origin,location)) return;
     if (e.source === window && e.data?.type === 'reimbursement-wallet-settings') { enabled = e.data.enabled === true; if (enabled) schedule(); return; }
     if (e.source !== window.parent || !location.hash.startsWith('#/bill/listDetails')) return;
     let data; try { data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch { return; }

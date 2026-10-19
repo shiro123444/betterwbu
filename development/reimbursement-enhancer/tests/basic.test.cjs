@@ -11,7 +11,7 @@ test('basic templates reject money, identities, stale edits and invalid scopes; 
 });
 function fixture(){
  let listener,user='teacher',resolve;const replies=[],form={formId:core.formId,state:2,SSQK:'',applyReason:'',jjkm:'',totalAmount:80,activitys:[{unchanged:true}]},instances={};
- const window={ReimbursementBasicCore:core,ReimbursementMemoryBridge:{getForm:()=>form,getQuery:()=>async()=>({success:true,data:[{data_item_code:'A',data_item_name:'交通费'}]})},addEventListener:(t,f)=>listener=f,postMessage:r=>replies.push(r)};
+ const window={ReimbursementSite:require("../extension/site.js"),ReimbursementBasicCore:core,ReimbursementMemoryBridge:{getForm:()=>form,getQuery:()=>async()=>({success:true,data:[{data_item_code:'A',data_item_name:'交通费'}]})},addEventListener:(t,f)=>listener=f,postMessage:r=>replies.push(r)};
  const location={hash:'#/reimbursementCreate?formId='+core.formId,origin:'http://wsbx.wbu.edu.cn'},localStorage={getItem:()=>JSON.stringify({id:user,groupId:'school',corpId:'corp'})};
  vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/basic-bridge.js','utf8'),{window,location,localStorage});
  for(const key of ['SSQK','applyReason','jjkm']){

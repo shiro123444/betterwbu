@@ -8,7 +8,7 @@ function fixture({ownNonconfigurable=false,ownWritable=false,syncFailure=false}=
  if(ownNonconfigurable)Object.defineProperty(picker,'$http',{get:()=>http,configurable:false});
  if(ownWritable)Object.defineProperty(picker,'$http',{value:http,configurable:true,writable:true,enumerable:true});
  const before=Object.getOwnPropertyDescriptor(picker,'$http');
- const window={parent:{postMessage:data=>messages.push(data)},postMessage:data=>messages.push(data),addEventListener:(k,f)=>events[k]=f};
+ const window={ReimbursementSite:require("../extension/site.js"),parent:{postMessage:data=>messages.push(data)},postMessage:data=>messages.push(data),addEventListener:(k,f)=>events[k]=f};
  vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/wallet-bridge.js','utf8'),{window,document:{documentElement:{},querySelector:()=>({__vue__:picker})},location:{origin:'http://wsbx.wbu.edu.cn',hash:'#/bill/list'},MutationObserver:class{observe(){}},ResizeObserver:class{observe(){}disconnect(){}},requestAnimationFrame:f=>f(),setTimeout:f=>timers.push(f)});
  return {picker,messages,requests,before,http,proto,get renders(){return renders},resolve:r=>resolve(r),reject:e=>reject(e),timers,disable:()=>events.message({source:window,origin:'http://wsbx.wbu.edu.cn',data:{type:'reimbursement-wallet-settings',enabled:false}})};
 }

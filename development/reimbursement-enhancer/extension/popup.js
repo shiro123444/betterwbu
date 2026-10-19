@@ -15,7 +15,7 @@
   let ready=false;
   try{
    const [tab]=await chrome.tabs.query({active:true,currentWindow:true});
-   if(!tab?.id||!/^https?:\/\/wsbx\.wbu\.edu\.cn\/workbench-web\//.test(tab.url||'')){
+   if(!tab?.id||!window.ReimbursementSite.workbench(tab.url||'')){
     status.textContent='请先打开报销工作台，再点击“重新检查”。';return;
    }
    const page=await send(tab.id,{type:'info-manager-status'});

@@ -12,7 +12,7 @@ assert manifest['version']==package['version']
 for entry in manifest['content_scripts']:
     for name in entry.get('js',[])+entry.get('css',[]):
         assert (extension/name).is_file(),name
-for source,target in [('memory-core.js','memory-core-isolated.js'),('basic-core.js','basic-core-http-isolated.js')]:
+for source,target in [('site.js','site-isolated.js'),('memory-core.js','memory-core-isolated.js'),('basic-core.js','basic-core-http-isolated.js')]:
     assert (extension/source).read_bytes()==(extension/target).read_bytes()
 files=[p for folder in ['extension','src','scripts','tests'] for p in (root/folder).rglob('*')
        if p.is_file() and '__pycache__' not in p.parts and p.suffix!='.pyc']

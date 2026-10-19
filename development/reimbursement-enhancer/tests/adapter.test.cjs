@@ -1,7 +1,7 @@
 const test=require('node:test'), assert=require('node:assert/strict'), fs=require('node:fs'), vm=require('node:vm');
 const core=require('../extension/core.js');
 const settle=()=>new Promise(setImmediate);
-function fixture(saved=10,nativeWatch=false){
+function fixture(saved=10,nativeWatch=false,origin='http://wsbx.wbu.edu.cn'){
  const pending=[],timers=new Map(),intervals=[],watchers=[];let serial=0;
  const form={formId:'c3771358d145490f9e363790c0519fde',state:2,totalAmount:saved,activitys:[{ASX060401:saved,behaviors:[{BSX060206:saved,behaviorDetail:[{BSX070306:10}]}]}],receivableInfo:[{actualReceivableCurrency:10}]};
  const ref=v=>({__ref:true,value:v});
@@ -13,13 +13,19 @@ function fixture(saved=10,nativeWatch=false){
  const oldState=()=>({page:ref({currentPage:1,pageSize:20,totalPage:0}),optionList:ref([]),showCols:ref([]),spinning:ref(false),onSearch:()=>{},handleEnter:()=>{},onMouseLeave:()=>{},dropdownVisibleChange:()=>{props.formProps.branchBankName=''},onChangePagination:()=>{},onSelect:(id,row)=>{props.formProps.branchBankName=id;props.formProps.branchBankName_object=[row]},selectChange:()=>{}});
  const bank={name:'selectTextCmpt',setup:oldState};
  const app={config:{},_context:{components:{bank}},_vnode:{}};
- const events={};const window={ReimbursementEnhancerCore:core,addEventListener:(type,fn)=>events[type]=fn,webpackJsonp:[]};
+ const events={};const window={ReimbursementSite:require("../extension/site.js"),ReimbursementEnhancerCore:core,addEventListener:(type,fn)=>events[type]=fn,webpackJsonp:[]};
  window.webpackJsonp.push=item=>{Object.values(item[1])[0]({}, {}, requireModule)};
- const sandbox={window,document:{documentElement:{},addEventListener(){},querySelector:()=>({__vue_app__:app})},MutationObserver:class{observe(){}},location:{hostname:'wsbx.wbu.edu.cn',origin:'http://wsbx.wbu.edu.cn',hash:'#/reimbursementCreate'},setInterval:f=>intervals.push(f),setTimeout:f=>{timers.set(++serial,f);return serial},clearTimeout:id=>timers.delete(id),Symbol,console};
+ const sandbox={window,document:{documentElement:{},addEventListener(){},querySelector:()=>({__vue_app__:app})},MutationObserver:class{observe(){}},location:{hostname:new URL(origin).hostname,origin,hash:'#/reimbursementCreate'},setInterval:f=>intervals.push(f),setTimeout:f=>{timers.set(++serial,f);return serial},clearTimeout:id=>timers.delete(id),Symbol,console};
  vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/enhance.js','utf8'),sandbox);
  const state=bank.setup(props,{});
- return {state,props,pending,form,intervals,watchers,app,vue,window,configure(settings){events.message({source:window,origin:'http://wsbx.wbu.edu.cn',data:{type:'reimbursement-enhancer-settings',settings}})},notify(){watchers[0].get();watchers[0].callback()},flush(){for(const [id,f]of [...timers]){timers.delete(id);f()}},tick(){intervals[0]()}};
+ return {state,props,pending,form,intervals,watchers,app,vue,window,configure(settings){events.message({source:window,origin,data:{type:'reimbursement-enhancer-settings',settings}})},notify(){watchers[0].get();watchers[0].callback()},flush(){for(const [id,f]of [...timers]){timers.delete(id);f()}},tick(){intervals[0]()}};
 }
+
+test('WebVPN initializes the native adapter and keeps financial values intact',()=>{
+ const f=fixture(10,false,'http://wsbx-wbu-edu-cn.webvpn.wbu.edu.cn:8118');
+ assert.equal(f.window.__reimbursementEnhancer.bankInstances,1);assert.equal(f.props.formProps.branchBankName,'original');
+ assert.equal(f.form.totalAmount,10);assert.equal(f.form.receivableInfo[0].actualReceivableCurrency,10);
+});
 test('native bank adapter keeps original selection, debounces and ignores old responses',async()=>{
  const f=fixture();f.state.dropdownVisibleChange(true);assert.equal(f.props.formProps.branchBankName,'original');
  f.pending[0].resolve({success:true,data:[],totalRecord:0});await settle();

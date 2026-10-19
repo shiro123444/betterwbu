@@ -26,12 +26,12 @@ test('only saved draft state can be captured, and backup is independent of react
  for(const state of [0,6,7,12,99])assert.throws(()=>core.capture({...draft(),state},'g|u'));
  const form=draft();form.payAmount=undefined;const snapshot=core.capture(form,'g|u');form.activitys[0].behaviors.length=0;assert.equal(snapshot.data.activitys[0].behaviors.length,1);
 });
-function bridgeFixture(){
- const listeners={},replies=[],calls=[],form=draft(),document={querySelectorAll:()=>[]},location={origin:'http://wsbx.wbu.edu.cn',hash:'#/reimbursementCreate?formEditId=draft-a'},http={post:async()=>({success:true,data:{}})},native={setupState:{formConfig:{},controlsList:[],onClickBtn:async event=>{calls.push(event);if(event.btnEvent.event==='4')await http.post('/reimburse-service/api/v1/reimbursement/ai-again',{id:'draft-a'})}}};
- const window={ReimbursementFillCompatCore:core,addEventListener:(type,f)=>listeners[type]=f,postMessage:r=>replies.push(r)};
+function bridgeFixture(origin='http://wsbx.wbu.edu.cn',eventOrigin=origin){
+ const listeners={},replies=[],calls=[],form=draft(),document={querySelectorAll:()=>[]},location={origin,hash:'#/reimbursementCreate?formEditId=draft-a'},http={post:async()=>({success:true,data:{}})},native={setupState:{formConfig:{},controlsList:[],onClickBtn:async event=>{calls.push(event);if(event.btnEvent.event==='4')await http.post('/reimburse-service/api/v1/reimbursement/ai-again',{id:'draft-a'})}}};
+ const window={ReimbursementSite:require("../extension/site.js"),ReimbursementFillCompatCore:core,addEventListener:(type,f)=>listeners[type]=f,postMessage:r=>replies.push(r)};
  vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/fill-compat.js','utf8'),{window,document,URL,URLSearchParams,localStorage:{getItem:()=>JSON.stringify({id:'u',groupId:'g'})},location});
  const environment={form:()=>form,http,readDraft:async id=>({success:true,data:{id,state:form.state,reimbursementNo:form.reimbursementNo,totalAmount:form.totalAmount,reimbData:structuredClone(form)}}),readAudit:async()=>({success:true,data:null})};window.ReimbursementFillCompat.bind(environment);window.ReimbursementFillCompat.register(native);
- return {form,native,calls,http,location,document,environment,async send(action,extra={}){await listeners.message({source:window,origin:'http://wsbx.wbu.edu.cn',data:{type:'reimbursement-fill-request',id:action,action,...extra}});return replies.at(-1)}};
+ return {form,native,calls,http,location,document,environment,async send(action,extra={}){await listeners.message({source:window,origin:eventOrigin,data:{type:'reimbursement-fill-request',id:action,action,...extra}});return replies.at(-1)}};
 }
 test('an empty native inventory cannot erase receipts from a positive expense draft',()=>{
  const form=draft();
@@ -116,14 +116,24 @@ test('native preflight distinguishes a missing transport-row date from a valid i
  const before=structuredClone(bill),issues=core.generationIssues(form,[bill]);assert.equal(issues.length,1);assert.equal(issues[0].index,0);assert.deepEqual(bill,before);
  assert.equal(core.generationIssues(form,[{...bill,barcode:'unselected'}]).length,0);bill.billData.air[0].issueDate='20260723';assert.equal(core.generationIssues(form,[bill]).length,0);
 });
-function workerFixture(){
+function workerFixture(origin='http://wsbx.wbu.edu.cn'){
  let listener,removed,rules;const timers=new Map(),store={},session={},chrome={runtime:{onMessage:{addListener:f=>listener=f}},storage:{local:{get:async defaults=>({...defaults,...store}),set:async data=>Object.assign(store,data)},session:{get:async key=>({[key]:session[key]}),set:async data=>Object.assign(session,data),remove:async key=>{delete session[key]}}},declarativeNetRequest:{updateSessionRules:async r=>{rules=r}},tabs:{onRemoved:{addListener:f=>removed=f}}};
- vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/background.js','utf8'),{chrome,ReimbursementFillCompatCore:core,URL,URLSearchParams,crypto:{randomUUID:()=> 'lease-token'},setTimeout:(f)=>{const id=timers.size+1;timers.set(id,f);return id},clearTimeout:id=>timers.delete(id)});
- const sender=id=>({tab:{id},frameId:0,url:'http://wsbx.wbu.edu.cn/workbench-web/#/reimbursementCreate?formEditId=draft-a'});
+ vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/background.js','utf8'),{chrome,ReimbursementSite:require("../extension/site.js"),ReimbursementFillCompatCore:core,URL,URLSearchParams,crypto:{randomUUID:()=> 'lease-token'},setTimeout:(f)=>{const id=timers.size+1;timers.set(id,f);return id},clearTimeout:id=>timers.delete(id)});
+ const sender=id=>({tab:{id},frameId:0,url:origin+'/workbench-web/#/reimbursementCreate?formEditId=draft-a'});
  let currentUrl=sender(42).url;
  chrome.tabs.get=async id=>({id,url:currentUrl});
  return {store,session,timers,get rules(){return rules},call:(message,tab=42,url,tabUrl)=>{currentUrl=tabUrl||url||sender(tab).url;return new Promise(resolve=>listener(message,{...sender(tab),...(url?{url}: {})},resolve))},remove:removed};
 }
+test('WebVPN worker persists a checked backup and restores its request guard after a fill lease',async()=>{
+ const origin='http://wsbx-wbu-edu-cn.webvpn.wbu.edu.cn:8118',f=workerFixture(origin),snapshot=core.capture(draft(),'g|u');
+ assert.equal((await f.call({type:'fill-backup-save',snapshot})).ok,true);
+ assert.equal((await f.call({type:'configure-guard'})).ok,true);
+ assert.equal(new RegExp(f.rules.addRules[0].condition.regexFilter).test(origin+'/reimburse-service/api/v1/reimbursement/ai'),true);
+ const lease=await f.call({type:'fill-guard-begin',scope:'g|u',id:'draft-a'});assert.equal(lease.ok,true);assert.equal(f.rules.addRules.length,0);
+ await f.call({type:'fill-guard-end',lease:lease.lease});assert.equal(f.rules.addRules.length,1);
+ assert.equal((await f.call({type:'fill-backup-get',scope:'g|u',id:'draft-a'},42,origin+'/workbench-web/', 'http://unrelated.example/workbench-web/#/reimbursementCreate?formEditId=draft-a')).ok,false);
+});
+
 test('backup follows the live tab route after SPA navigation while rejecting an old draft',async()=>{
  const f=workerFixture(),snapshot=core.capture(draft(),'g|u');
  const oldDocument='http://wsbx.wbu.edu.cn/workbench-web/#/reimbursementList';
@@ -169,7 +179,7 @@ test('generation outcome is persisted separately from the server flag and is not
 function uiFixture(failAt,backend={}){
  const {JSDOM}=require('jsdom'),dom=new JSDOM('<main></main>',{url:'http://wsbx.wbu.edu.cn/workbench-web/#/reimbursementCreate?formEditId=draft-a',runScripts:'outside-only'}),w=dom.window,trace=[],notices=[];
  const snapshot=core.capture(draft(),'g|u');
- w.chrome={runtime:{sendMessage:async message=>{trace.push(message.type);if(message.type===failAt)return {ok:false};if(message.type==='fill-backup-get')return {ok:true};if(message.type==='fill-guard-begin')return {ok:true,lease:'token'};return {ok:true}}}};
+ w.ReimbursementSite=require("../extension/site.js");w.chrome={runtime:{sendMessage:async message=>{trace.push(message.type);if(message.type===failAt)return {ok:false};if(message.type==='fill-backup-get')return {ok:true};if(message.type==='fill-guard-begin')return {ok:true,lease:'token'};return {ok:true}}}};
  w.postMessage=message=>{
   trace.push(message.action);
   const result={type:'reimbursement-fill-reply',id:message.id,ok:message.action!==failAt,error:'模拟失败',eligible:true,available:true,scope:'g|u',draftId:'draft-a'};
@@ -245,7 +255,7 @@ test('printed total is read only from the report preview with the matching reimb
 test('one-click workflow backs up, completes native fill, restores exact checked amounts and requests save without submitting',async()=>{
  const {JSDOM}=require('jsdom'),dom=new JSDOM('<main></main>',{url:'http://wsbx.wbu.edu.cn/workbench-web/#/reimbursementCreate?formEditId=draft-a',runScripts:'outside-only'}),w=dom.window,form=draft(),trace=[];let saved;
  w.localStorage.setItem('userInfo',JSON.stringify({id:'u',groupId:'g'}));w.ReimbursementFillCompatCore=core;
- w.chrome={runtime:{sendMessage:async message=>{trace.push(message.type);if(message.type==='fill-backup-save'){saved=structuredClone(message.snapshot);return {ok:true}}if(message.type==='fill-backup-get')return {ok:true,snapshot:saved};if(message.type==='fill-guard-begin')return {ok:true,lease:'once'};return {ok:true}}}};
+ w.ReimbursementSite=require("../extension/site.js");w.chrome={runtime:{sendMessage:async message=>{trace.push(message.type);if(message.type==='fill-backup-save'){saved=structuredClone(message.snapshot);return {ok:true}}if(message.type==='fill-backup-get')return {ok:true,snapshot:saved};if(message.type==='fill-guard-begin')return {ok:true,lease:'once'};return {ok:true}}}};
  w.postMessage=data=>queueMicrotask(()=>w.dispatchEvent(new w.MessageEvent('message',{data,source:w,origin:w.location.origin})));
  w.eval(fs.readFileSync(__dirname+'/../extension/fill-compat.js','utf8'));w.eval(fs.readFileSync(__dirname+'/../extension/fill-compat-ui.js','utf8'));
  const http={post:async()=>({success:true,data:{}})};w.ReimbursementFillCompat.bind({form:()=>form,http,readDraft:async id=>({success:true,data:{id,state:form.state,totalAmount:form.totalAmount,reimbData:structuredClone(form)}}),readAudit:async()=>({success:true,data:null})});w.ReimbursementFillCompat.register({setupState:{formConfig:{},controlsList:[],onClickBtn:async event=>{trace.push(event.btnEvent.event);if(event.btnEvent.event==='4'){await http.post('/reimburse-service/api/v1/reimbursement/ai-again',{id:'draft-a'});form.aiFlag='true';form.totalAmount='10261';form.activitys=[]}else if(event.btnEvent.event==='1'){assert.equal(event.form.totalAmount,'8753.80');assert.equal(event.form.aiFlag,'true')}}}});
@@ -255,4 +265,11 @@ test('one-click workflow backs up, completes native fill, restores exact checked
  assert.equal(saved.data.totalAmount,'8753.80');assert.ok(trace.includes('4'));assert.ok(trace.includes('1'));assert.ok(trace.includes('fill-guard-end'));
  assert.equal(form.totalAmount,'8753.80');assert.equal(form.aiFlag,'true');assert.equal(form.receivableInfo[1].actualReceivableCurrency,'8033.80');assert.equal(form.activitys[0].behaviors[0].behaviorDetail[0].billRelation[0].BSX070804,'103.90');
  assert.equal(trace.includes('5'),false);assert.equal(trace.includes('6'),false);w.close();
+});
+
+test('WebVPN restored-origin preflight requests return current and saved findings without invoking native actions',async()=>{
+ const f=bridgeFixture('http://wsbx-wbu-edu-cn.webvpn.wbu.edu.cn:8118','http://wsbx.wbu.edu.cn'),before=JSON.stringify(f.form);
+ assert.equal((await f.send('status')).ok,true);const checked=await f.send('server-status');
+ assert.equal(checked.ok,true);assert.ok(Array.isArray(checked.report.currentDetailIssues));assert.ok(Array.isArray(checked.report.detailIssues));
+ assert.equal(JSON.stringify(f.form),before);assert.equal(f.calls.length,0);
 });

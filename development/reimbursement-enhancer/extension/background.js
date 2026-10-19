@@ -1,4 +1,5 @@
 const defaults = { enabled: true, totals: true, aiGuard: true };
+if(typeof importScripts==='function')importScripts('site.js');
 if(typeof importScripts==='function')importScripts('memory-core.js');
 if(typeof importScripts==='function')importScripts('basic-core.js');
 if(typeof importScripts==='function')importScripts('fill-compat-core.js');
@@ -7,13 +8,13 @@ const fillLeases=new Map();
 const leaseKey=id=>'fillCompatLease:'+id;
 async function storedLease(id){if(chrome.storage.session){const saved=await chrome.storage.session.get(leaseKey(id));return saved[leaseKey(id)]}return fillLeases.get(id)}
 async function clearLease(id){const lease=fillLeases.get(id);if(lease)clearTimeout(lease.timer);fillLeases.delete(id);if(chrome.storage.session)await chrome.storage.session.remove(leaseKey(id))}
-const workbench=sender=>sender.tab?.id&&/^https?:\/\/wsbx\.wbu\.edu\.cn\/workbench-web\//.test(sender.url||'');
+const workbench=sender=>sender.tab?.id&&ReimbursementSite.workbench(sender.url||'');
 function draftMatches(sender,id){try{const hash=new URL(sender.url).hash;return hash.startsWith('#/reimbursementCreate?')&&new URLSearchParams(hash.split('?')[1]).get('formEditId')===id}catch{return false}}
 async function configureGuard(id,url){
  const settings=await chrome.storage.local.get(defaults);let lease=await storedLease(id);
  if(lease&&(lease.until<=Date.now()||(url&&!draftMatches({url},lease.id)))){await clearLease(id);lease=null}
  return chrome.declarativeNetRequest.updateSessionRules({removeRuleIds:[id],addRules:settings.enabled&&settings.aiGuard&&!(lease&&lease.until>Date.now())?[{
-  id,priority:1,action:{type:'block'},condition:{regexFilter:'^https?://wsbx\\.wbu\\.edu\\.cn/reimburse-service/api/v1/reimbursement/ai(?:-again)?(?:\\?|$)',resourceTypes:['xmlhttprequest'],tabIds:[id]}
+  id,priority:1,action:{type:'block'},condition:{regexFilter:ReimbursementSite.aiRequestPattern,resourceTypes:['xmlhttprequest'],tabIds:[id]}
  }]:[]});
 }
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
@@ -49,14 +50,14 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
       try{if(chrome.storage.session)await chrome.storage.session.set({[leaseKey(tabId)]:{token,id,scope,until:lease.until}});await configureGuard(tabId,currentSender.url);return {ok:true,lease:token}}catch(error){await clearLease(tabId);throw error}
     });memoryQueue.then(respond).catch(()=>respond({ok:false}));return true;
   }
-  if(['basic-template-save','basic-template-delete'].includes(message.type)&&sender.tab?.id&&/^https?:\/\/wsbx\.wbu\.edu\.cn\/workbench-web\//.test(sender.url||'')){
+  if(['basic-template-save','basic-template-delete'].includes(message.type)&&workbench(sender)){
     memoryQueue=memoryQueue.catch(()=>{}).then(async()=>{
       const data=await chrome.storage.local.get({basicTemplateDatabase:{}});
       const next=message.type==='basic-template-save'?ReimbursementBasicCore.save(data.basicTemplateDatabase,message.scope,message.entry,message.previous):ReimbursementBasicCore.remove(data.basicTemplateDatabase,message.scope,message.entry);
       if(!next)return false;await chrome.storage.local.set({basicTemplateDatabase:next});return true;
     });memoryQueue.then(ok=>respond({ok})).catch(()=>respond({ok:false}));return true;
   }
-  if(message.type==='memory-save-recipient'&&sender.tab?.id&&/^https?:\/\/wsbx\.wbu\.edu\.cn\/workbench-web\//.test(sender.url||'')){
+  if(message.type==='memory-save-recipient'&&workbench(sender)){
     memoryQueue=memoryQueue.catch(()=>{}).then(async()=>{
       const data=await chrome.storage.local.get({memoryBank:true,memoryDatabase:{}});
       if(!data.memoryBank)return false;
@@ -65,7 +66,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
       await chrome.storage.local.set({memoryDatabase:next});return true;
     });memoryQueue.then(ok=>respond({ok})).catch(()=>respond({ok:false}));return true;
   }
-  if(['memory-delete-recipient','memory-clear-recipients'].includes(message.type)&&sender.tab?.id&&/^https?:\/\/wsbx\.wbu\.edu\.cn\/workbench-web\//.test(sender.url||'')){
+  if(['memory-delete-recipient','memory-clear-recipients'].includes(message.type)&&workbench(sender)){
     memoryQueue=memoryQueue.catch(()=>{}).then(async()=>{
       if(ReimbursementMemoryCore.recipientScope(message.scope)!==message.scope)return false;
       if(message.type==='memory-delete-recipient'&&!ReimbursementMemoryCore.clean('recipient',message.entry))return false;
@@ -73,7 +74,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
       await chrome.storage.local.set({memoryDatabase:next});return true;
     });memoryQueue.then(ok=>respond({ok})).catch(()=>respond({ok:false}));return true;
   }
-  if(['memory-delete','memory-clear-scope'].includes(message.type)&&sender.tab?.id&&/^https?:\/\/wsbx\.wbu\.edu\.cn\/workbench-web\//.test(sender.url||'')){
+  if(['memory-delete','memory-clear-scope'].includes(message.type)&&workbench(sender)){
     memoryQueue=memoryQueue.catch(()=>{}).then(async()=>{
       const data=await chrome.storage.local.get({memoryDatabase:{}});let next;
       if(message.type==='memory-delete'){
@@ -90,7 +91,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
     memoryQueue=memoryQueue.catch(()=>{}).then(()=>chrome.storage.local.remove('memoryDatabase'));
     memoryQueue.then(()=>respond({ok:true})).catch(()=>respond({ok:false}));return true;
   }
-  if(message.type==='memory-remember'&&sender.tab?.id&&/^https?:\/\/wsbx\.wbu\.edu\.cn\/workbench-web\//.test(sender.url||'')){
+  if(message.type==='memory-remember'&&workbench(sender)){
     memoryQueue=memoryQueue.catch(()=>{}).then(async()=>{
       const data=await chrome.storage.local.get({enabled:true,memory:true,memoryBank:true,memoryDatabase:{}});
       if(!data.enabled||!data.memory||(!data.memoryBank&&['bankAccount','recipient'].includes(message.descriptor?.key)))return false;
@@ -101,7 +102,7 @@ chrome.runtime.onMessage.addListener((message, sender, respond) => {
     });
     memoryQueue.then(ok=>respond({ok})).catch(()=>respond({ok:false}));return true;
   }
-  if (message.type !== 'configure-guard' || !sender.tab?.id || !/^https?:\/\/wsbx\.wbu\.edu\.cn\//.test(sender.url || '')) return;
+  if (message.type !== 'configure-guard' || !workbench(sender)) return;
   configureGuard(sender.tab.id,sender.url).then(() => respond({ ok: true })).catch(() => respond({ ok: false }));
   return true;
 });

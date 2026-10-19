@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  if (location.hostname !== 'wsbx.wbu.edu.cn' || window.__reimbursementEnhancer) return;
+  if (!window.ReimbursementSite.supported(location) || window.__reimbursementEnhancer) return;
   const core = window.ReimbursementEnhancerCore;
   const status = window.__reimbursementEnhancer = { version: '0.13.9', bankInstances: 0, transferInstances: 0, summaryInstances: 0, compatible: false };
   let settings = { enabled: true, totals: true, aiGuard: true }, requireModule, vue, controller;
@@ -9,7 +9,7 @@
   const totalsBaseline = new WeakMap();
   let totalsWatching=false;
   window.addEventListener('message', event => {
-    if (event.source === window && event.origin === location.origin && event.data?.type === 'reimbursement-enhancer-settings') {
+    if (event.source === window && window.ReimbursementSite.messageOrigin(event.origin,location) && event.data?.type === 'reimbursement-enhancer-settings') {
       Object.assign(settings, event.data.settings);
     }
   });

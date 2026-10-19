@@ -6,7 +6,7 @@
 <div class="reimbursementCreate"><h2>费用明细</h2><button class="fileFold">发票夹（合成票据）</button><div class="activity-root"></div><p id="counts"></p><div class="results"><table><thead><tr><th>分类</th><th>姓名</th><th>金额</th><th>关联票据及使用金额</th></tr></thead><tbody id="rows"></tbody></table></div></div>
 <p id="audit"></p><button id="export">查看本地序列化结果</button><pre id="serialized"></pre></main>
 <iframe class="iframe-box1" hidden srcdoc="<div id='app'></div>"></iframe>
-<script>if(!location.hash)location.hash='#/reimbursementCreate'</script><script src="../../../extension/core.js"></script><script src="../../../extension/invoice-associations.js"></script><script src="../../../extension/invoice-core.js"></script><script src="../../../extension/invoices.js"></script>
+<script>if(!location.hash)location.hash='#/reimbursementCreate'</script><script src="../../../extension/site.js"></script><script src="../../../extension/core.js"></script><script src="../../../extension/invoice-associations.js"></script><script src="../../../extension/invoice-core.js"></script><script src="../../../extension/invoices.js"></script>
 <script>
 const names=['测试甲','测试乙','测试丙'];
 function bill(id,title,total,content,extra={}){return {id:'record-'+id,dataId:'record-'+id,barcode:id,ticketCode:'1-024',billTitle:title,ticketName:'电子发票（普通发票）',totalAmount:total,billData:{totalTax:'6.79',details:[{inx:'0',content,amount:(Number(total)-6.79).toFixed(2),taxAmount:'6.79'}],...extra}}}

@@ -129,7 +129,7 @@
     }
   }
   window.addEventListener("message", async (event) => {
-    if (event.source !== window || event.origin !== location.origin || event.data?.type !== "reimbursement-fill-request") return;
+    if (event.source !== window || !window.ReimbursementSite.messageOrigin(event.origin,location) || event.data?.type !== "reimbursement-fill-request") return;
     const { id, action, snapshot } = event.data;
     let result;
     try {

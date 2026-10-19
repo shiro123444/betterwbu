@@ -29,7 +29,7 @@
     catch{if(enabled&&route()&&vm===target&&queryScope(target)===expected)emit(tracker.failed('查询失败，请重新查询'));return false}
     finally{clearTimeout(timeout);busy=false;if(enabled&&route()&&vm===target&&queryScope(target)===expected)emit(tracker.snapshot());else inspect()}
   }
-  window.addEventListener('message',e=>{if(e.source!==window||e.origin!==location.origin)return;const d=e.data;if(d?.type==='reimbursement-wallet-settings'){enabled=d.enabled===true;inspect()}
+  window.addEventListener('message',e=>{if(e.source!==window||!window.ReimbursementSite.messageOrigin(e.origin,location))return;const d=e.data;if(d?.type==='reimbursement-wallet-settings'){enabled=d.enabled===true;inspect()}
     if(d?.type==='reimbursement-recognition-command'&&enabled&&route()){if(d.action==='refresh')refresh(true);else if(d.action==='clear')emit(tracker.clearTerminal())}});
   new MutationObserver(()=>{if(Date.now()-lastScan>1000)inspect()}).observe(document.documentElement,{childList:true,subtree:true});
   const timer=setInterval(()=>{inspect();refresh()},5000);
