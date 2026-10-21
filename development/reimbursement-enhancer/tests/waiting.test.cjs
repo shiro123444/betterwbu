@@ -67,3 +67,4 @@ test('standard page-region loading shares motion without taking focus or blockin
  const f=fixture(false,true);assert.equal(f.overlay.getAttribute('data-re-local'),'true');assert.equal(f.overlay.style.width,'500px');assert.equal(f.overlay.style.left,'30px');assert.equal(f.document.activeElement,f.focusBefore);assert.equal(f.key('Tab').prevented,undefined);
  assert.equal(f.indicator.getAttribute('data-re-wait-indicator'),'true');f.advance(3);assert.equal(f.overlay.children[0].children[4].textContent,'已等待 00:03');f.setActive(false);assert.equal(f.overlay.hidden,true);assert.equal(f.timers.size,0);assert.equal(f.indicator.getAttribute('data-re-wait-indicator'),null);
 });
+test('modern wallet inline state suppresses the duplicate wait overlay',()=>{const f=fixture();f.document.documentElement.dataset.bwWalletModern='';f.notify();assert.equal(f.overlay.hidden,true);assert.equal(f.timers.size,0)});

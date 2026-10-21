@@ -274,3 +274,7 @@ html[data-bw-ui="true"] .layout-content .ant-tabs:has(>.ant-tabs-bar .addButton)
    keyboard behavior and the existing preventDefault router protection. */
 .bw-section-nav{flex-wrap:nowrap;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:thin}
 .bw-section-nav a{flex:0 0 auto;white-space:nowrap}
+/* Visible before the embedded wallet is ready; never cover the workbench. */
+.bw-wallet-host-state{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;margin:8px 0;background:#f2f7ff;border:1px solid #dce8fa;border-radius:8px;color:#42658e;font:14px/1.6 var(--bw-font,system-ui)}
+.bw-wallet-host-state[hidden],.bw-wallet-host-state button[hidden]{display:none!important}
+.bw-wallet-host-state button{border:1px solid #c5d7f1;background:#fff;border-radius:8px;padding:7px 12px;color:#2466bc;cursor:pointer;font:inherit;white-space:nowrap}

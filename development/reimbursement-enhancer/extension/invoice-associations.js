@@ -115,19 +115,54 @@
     }
     return [...groups.values()];
   }
+  function reclassifications(form,activityId,mode,categories,expenses){
+    if(mode!=='replace')return [];
+    const sources=new Map();
+    for(const expense of expenses)for(const s of expense.sources){
+      const old=sources.get(s.record);
+      if(old&&(old.barcode!==s.barcode||old.category!==expense.category))throw Error('票据关联标识或目标分类不一致');
+      sources.set(s.record,{barcode:s.barcode,category:expense.category});
+    }
+    const barcodes=new Map([...sources].map(([id,s])=>[s.barcode,id])),moves=[];
+    for(const activity of form.activitys||[]){
+      if(activity.activityMetaId!==activityId)continue;
+      for(const behavior of activity.behaviors||[]){
+        if(behavior.behaviorKey==='summary'||behavior.behaviorMetaName==='总览'||categories.includes(behavior.behaviorMetaName))continue;
+        for(const record of behavior.behaviorDetail||[]){
+          const links=record.BSX0709||[],paid=links.filter(l=>String(l.BSX070811)!=='0');
+          const matches=l=>sources.has(text(l.BSX070802))||barcodes.has(text(l.BSX070807));
+          if(!paid.some(matches))continue;
+          // Move only complete, unambiguous invoice-backed rows in this activity.
+          // Mixed manual amounts, unrelated invoices and supporting links stay untouched.
+          if(links.length!==paid.length||paid.some(l=>!matches(l)))throw Error('跨分类原费用行含其他票据或凭证，请先手动拆分原明细');
+          const targets=new Set();let used=0;
+          for(const l of paid){
+            const source=sources.get(text(l.BSX070802)),amount=cents(l.BSX070804??0);
+            if(!source||source.barcode!==text(l.BSX070807)||amount<=0)throw Error('跨分类原票据关联不完整，请核对原明细');
+            targets.add(source.category);used=sum([used,amount]);
+          }
+          if(cents(record.BSX070306)!==used)throw Error('跨分类原费用金额与票据不一致，请先核对原明细');
+          moves.push({behavior,record,amountCents:used,fromCategory:behavior.behaviorMetaName,toCategories:[...targets]});
+        }
+      }
+    }
+    return moves;
+  }
   function assertRetained(form,activityId,mode,categories,expenses){
+    const moves=reclassifications(form,activityId,mode,categories,expenses),removed=new Set(moves.map(m=>m.record));
     const budget=new Map();for(const r of expenses)for(const s of r.sources){let b=budget.get(s.record);if(!b){b={barcode:s.barcode,total:s.total,used:0};budget.set(s.record,b)}if(b.barcode!==s.barcode||b.total!==s.total)throw Error('票据关联标识不一致');b.used=sum([b.used,s.used])}
     const barcodeToId=new Map([...budget].map(([id,b])=>[b.barcode,id]));
     for(const a of form.activitys||[])for(const b of a.behaviors||[]){
       if(mode==='replace'&&a.activityMetaId===activityId&&categories.includes(b.behaviorMetaName)&&b.behaviorKey!=='summary')continue;
-      for(const d of b.behaviorDetail||[])for(const l of d.BSX0709||[]){
+      for(const d of b.behaviorDetail||[]){if(removed.has(d))continue;for(const l of d.BSX0709||[]){
         if(String(l.BSX070811)==='0')continue;
         const id=text(l.BSX070802),known=budget.get(id)||budget.get(barcodeToId.get(text(l.BSX070807)));
         if(!known)continue;
         const used=cents(l.BSX070804??0);if(used<0||(!used&&cents(d.BSX070306??0)>0))throw Error('原费用行票据使用金额不完整，请更新对应分类');known.used=sum([known.used,used]);
-      }
+      }}
     }
     for(const b of budget.values())if(b.used>b.total)throw Error('发票已关联其他明细，重复使用金额超出票面金额');
+    return moves;
   }
   function signature(links,withIds=false){return JSON.stringify(links.map(l=>[withIds?text(l.id):null,text(l.BSX070802),text(l.BSX070807),text(l.BSX070803),cents(l.BSX070804),text(l.BSX070808),text(l.BSX070809),text(l.BSX070810),text(l.BSX070811)]))}
   function assertRecord(record,expected){

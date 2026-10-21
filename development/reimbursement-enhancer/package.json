@@ -1,6 +1,6 @@
 {
   "name": "reimbursement-enhancer",
-  "version": "0.13.20",
+  "version": "0.13.24",
   "private": true,
   "type": "commonjs",
   "scripts": {

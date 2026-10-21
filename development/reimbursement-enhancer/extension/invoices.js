@@ -12,7 +12,7 @@
   function same(a,b) { return runtime?.raw ? runtime.raw(a) === runtime.raw(b) : a === b; }
   function current() {
     const form = runtime?.form(), native = feeInstance?.setupState?.form;
-    if (!runtime?.settings.enabled || !runtime.settings.totals || !location.hash.startsWith('#/reimbursementCreate') || String(form?.state) !== '2' || form.formId !== 'c3771358d145490f9e363790c0519fde' || !alive(feeInstance) || feeInstance.setupState.isEdit?.data === false) return null;
+    if (!runtime?.settings.enabled || !runtime.settings.totals || !location.hash.startsWith('#/reimbursementCreate') || String(form?.state) !== '2' || !core.supportsForm(form) || !alive(feeInstance) || feeInstance.setupState.isEdit?.data === false) return null;
     if (!native || native.formId !== form.formId || native.reimbursementId !== form.reimbursementId || String(native.state) !== '2') return null;
     return {form, native};
   }
@@ -32,7 +32,7 @@
     function entry(b, depth = 0) {
       if (!b || depth > 16) return null;
       const d=b.billData || {}, data={};
-      for(const key of ['invoiceCode','invoiceNO','totalAmount','totalTax','currency','currencyCode','templateGroupName','business','summary','cancel','details','air','hotel','train','trainNO','name','seatClass','origin','dest','cfrq','dateOfArrive','dateOfDeparture','checkInDate','checkOutDate']) data[key]=d[key];
+      for(const key of ['invoiceCode','invoiceNO','totalAmount','totalTax','currency','currencyCode','templateGroupName','business','summary','content','itemName','feeName','feeType','chargeType','expenseType','billTitle','billTypeCode','cancel','details','processDetail','air','hotel','train','trainNO','name','seatClass','origin','dest','cfrq','dateOfArrive','dateOfDeparture','checkInDate','checkOutDate']) data[key]=d[key];
       return [core.identifiers(b),b.realityId,b.ticketCode,b.delStatus,b.ticketName,b.billTitle,b.fileName,b.fileType,b.dataType,b.totalAmount,data,(b.subBillCards || []).map(child=>entry(child,depth+1))];
     }
     return JSON.stringify(bills.map(b=>entry(b)));
@@ -61,6 +61,7 @@
     for(const row of result.rows)row.bill={...row.bill,nativeAssociationMetadata:core.associations.nativeMetadata(c.form,row.bill)};
     for (const row of result.rows) if (existing(c.form,row,mode === 'replace' ? template.activityMetaId : undefined)) { row.selected = false; row.blocked = true; row.reason = '已存在对应费用明细，不重复生成'; }
     for(const row of result.rows)if(!row.blocked&&row.category){try{core.associations.source(row.bill)}catch(e){row.associationError=e.message}}
+    core.autoAllocate(result.rows);
     return {...result, mode, richSignature:richSignature(rich), allowanceCategories:(template.behaviors || []).map(b=>b.behaviorMetaName), allowanceAllowed:template.activityMetaName === '常规差旅', form:c.form, native:c.native, expected:snapshot(c.form), activityId:template.activityMetaId, available};
   }
   function syncPreview(force = false) {
@@ -127,8 +128,8 @@
     const rows = [...expenses,...allowanceRows].filter(r => r.selected && !r.blocked && r.category && Number.isSafeInteger(r.amountCents));
     const categories = core.replacementCategories(rows,plan.allowance,plan.allowanceCategories);
     if (!rows.length && !(plan.mode === 'replace' && categories.length)) throw Error('请先选择分类和有效票据。');
-    const projected = core.projection(c.form,plan.activityId,rows,plan.mode,categories);
-    core.associations.assertRetained(c.form,plan.activityId,plan.mode,categories,expenses);
+    const reclassified=core.associations.assertRetained(c.form,plan.activityId,plan.mode,categories,expenses);
+    const projected = core.projection(c.form,plan.activityId,rows,plan.mode,categories,reclassified);
     core.total(rows);
     const template = templates().find(a => a.activityMetaId === plan.activityId);
     if (!template) throw Error('费用模板已变化，请重新预览。');
@@ -165,6 +166,11 @@
       await runtime.nextTick(); runtime.refresh();
       if (!active() || !activity) throw Error('表单已切换，生成已取消。');
       const target = child(activity); if (!target || target.setupState.isEdit?.data === false) throw Error('原系统费用行尚未就绪，请展开费用明细后重试。');
+      for(const move of reclassified){
+        const index=move.behavior.behaviorDetail.indexOf(move.record);
+        if(index<0)throw Error('跨分类原费用行已变化，生成已取消');
+        capture(move.behavior,'behaviorDetail');move.behavior.behaviorDetail.splice(index,1);
+      }
       capture(activity,'behaviors');
       if (!imported.has(c.form)) imported.set(c.form,new WeakMap());
       if (plan.mode === 'replace') for (const behavior of activity.behaviors || []) {
@@ -265,13 +271,14 @@
         if(preview.mode==='append')for(const row of allowance.rows)if(existing(preview.form,row))throw Error('已有同人同期补贴，请使用更新模式');
         const expenses=core.associations.compile(preview.rows);
         const rows=[...expenses,...allowance.rows],names=core.replacementCategories(rows,preview.allowance,preview.allowanceCategories);
-        core.associations.assertRetained(preview.form,preview.activityId,preview.mode,names,expenses);
-        projected=core.projection(preview.form,preview.activityId,rows,preview.mode,names);
+        const reclassified=core.associations.assertRetained(preview.form,preview.activityId,preview.mode,names,expenses);
+        projected=core.projection(preview.form,preview.activityId,rows,preview.mode,names,reclassified);
+        projected.migrations=reclassified.map(m=>m.fromCategory+' → '+m.toCategories.join('、'));
         projected.count=rows.length;
       }catch(e){error=e.message}
       const money=n=>'¥'+(n/100).toFixed(2);invoiceMetric.textContent=money(core.total(preview.rows));allowanceMetric.textContent=money(allowance.amount);totalMetric.textContent=projected?money(projected.amount):'待核对';
       const pending=preview.rows.filter(r=>!r.blocked&&!r.category).length;
-      summary.textContent=error || (preview.mode==='replace'?'更新 '+(projected?.count||0)+' 条明细 · '+(projected?.categories.join('、') || '未选择分类'):'追加 '+(projected?.count||0)+' 条明细')+(projected?.retained?' · 其他费用保留 '+money(projected.retained):'')+(pending?' · '+pending+' 张待分类':'');
+      summary.textContent=error || (preview.mode==='replace'?'更新 '+(projected?.count||0)+' 条明细 · '+(projected?.categories.join('、') || '未选择分类'):'追加 '+(projected?.count||0)+' 条明细')+(projected?.migrations?.length?' · 迁移 '+projected.migrations.length+' 条原关联明细（'+[...new Set(projected.migrations)].join('、')+'）':'')+(projected?.retained?' · 其他费用保留 '+money(projected.retained):'')+(pending?' · '+pending+' 张待分类':'');
       summary.dataset.error=String(!!error);
       applyButton.disabled=previewPending||!!error||!(selected.length+allowance.rows.length||(preview.mode==='replace'&&projected?.categories.length));
     }
@@ -279,11 +286,11 @@
     for(const row of preview.rows){
       const item=el('div');item.className='re-invoice-row';
       const check=el('input');check.type='checkbox';check.checked=row.selected;check.disabled=row.blocked;check.setAttribute('aria-label','生成费用：'+row.title);
-      const title=el('div',row.title);const suffix=String(row.bill.billData?.invoiceNO||row.bill.barcode||'').slice(-4);if(suffix)title.append(el('small','票号末四位 '+suffix));if(row.reason||row.associationError)title.append(el('small',row.reason||row.associationError));
+      const title=el('div',row.title);const suffix=String(row.bill.billData?.invoiceNO||row.bill.barcode||'').slice(-4);if(suffix)title.append(el('small','票号末四位 '+suffix));const issue=el('small',row.reason||row.associationError||'');title.append(issue);
       const select=el('select');select.setAttribute('aria-label','费用分类：'+row.title);select.disabled=row.blocked;const blank=el('option','选择分类');blank.value='';select.append(blank);
       for(const name of preview.available){const o=el('option',name);o.value=name;select.append(o)}select.value=row.category || '';
       let allocations;
-      check.addEventListener('change',()=>{row.touched=true;row.selected=check.checked;if(allocations)allocations.hidden=!row.selected;refresh()});select.addEventListener('change',()=>{row.touched=true;row.category=select.value || null;row.selected=!!row.category;check.checked=row.selected;if(allocations){allocations.hidden=!row.selected;allocations.dataset.category=row.category}refresh()});
+      check.addEventListener('change',()=>{row.touched=true;row.selected=check.checked;if(allocations)allocations.hidden=!row.selected;refresh()});select.addEventListener('change',()=>{row.touched=true;row.category=select.value || null;row.reason=row.category?'':core.classify(row.bill,preview.available).reason||'请选择费用分类';issue.textContent=row.reason||row.associationError||'';row.selected=!!row.category;check.checked=row.selected;if(allocations){allocations.hidden=!row.selected;allocations.dataset.category=row.category}refresh()});
       const value=el('span',row.amountCents==null?'待核对':'¥'+(row.amountCents/100).toFixed(2));value.className='re-invoice-amount';
       item.append(check,title,select,value);(row.blocked?excludedList:list).append(item);
       if(!row.blocked){allocations=allocationEditor(row,preview.rows,refresh);allocations.hidden=!row.selected;list.append(allocations)}
@@ -313,7 +320,7 @@
     names.addEventListener('input',()=>{
       row.touched=true;row.allocationPeople=names.value;
       let samePeople=false;
-      try{const people=core.associations.people(names.value);samePeople=!!row.allocations?.length&&people.length===row.allocations.length&&people.every((name,i)=>name===row.allocations[i].person)}catch{ /* A changed or incomplete list requires an explicit split. */ }
+      try{const people=core.associations.people(names.value);samePeople=!!row.allocations?.length&&people.length===row.allocations.length&&people.every((name,i)=>name===row.allocations[i].person);if(!samePeople&&people.length===1){row.allocations=core.associations.evenSplit(row.amountCents,people);samePeople=true;draw()}}catch{ /* Multiple or incomplete names require an explicit split. */ }
       if(!samePeople){row.allocations=[];draw()}
       refresh();
     });
@@ -340,6 +347,7 @@
     }
     const c = current(); button.hidden = !runtime?.settings.enabled || !runtime.settings.totals;
     button.disabled = !c;
+    button.title = c ? '预览费用、归属人员及原生票据关联，不触发 AI 或提交' : '仅支持可编辑的差旅费、参加会议报销单；请展开费用明细后重试';
     const revert = button.parentNode.querySelector('.re-invoice-undo'); if (revert) revert.hidden = !undo || !c || !same(undo.form,c.form);
   }
   window.ReimbursementInvoiceTools = {
@@ -349,7 +357,7 @@
     },
     register(i) {
       if (!alive(i)) return;
-      if (i.props?.componentInfo?.key === 'activitys' && typeof i.setupState?.onAddTableList === 'function') feeInstance = i;
+      if (i.props?.componentInfo?.key === 'activitys' && typeof i.setupState?.onAddTableList === 'function' && i.setupState.form?.formId && Array.isArray(i.setupState.activityOptionList)) feeInstance = i;
       if (i.props?.tableRecord?.behaviors && typeof i.setupState?.onAddBehaviorList === 'function') detailInstances.add(i);
     },
     mount() { for (const i of detailInstances) if (!alive(i)) detailInstances.delete(i); mount(); },

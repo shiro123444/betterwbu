@@ -1,10 +1,12 @@
 (() => {
   const defaults = { enabled: true, totals: true, aiGuard: true };
-  let current = defaults;
+  let current = defaults, stopped = false, guardTimer, buttonTimer;
+  function reconcile(){if(stopped)return;try{chrome.runtime.sendMessage({type:'configure-guard'}).catch(()=>{})}catch{stopped=true;clearInterval(guardTimer);clearInterval(buttonTimer)}}
   async function publish() {
-    current = await chrome.storage.local.get(defaults);
+    if(stopped)return;
+    try{current = await chrome.storage.local.get(defaults)}catch{stopped=true;return}
     window.postMessage({ type: 'reimbursement-enhancer-settings', settings: current }, location.origin);
-    chrome.runtime.sendMessage({ type: 'configure-guard' }).catch(() => {});
+    reconcile();
     buttons();
   }
   const changed = new Map();
@@ -26,8 +28,8 @@
   chrome.storage.onChanged.addListener(publish);
   publish();
   document.addEventListener('DOMContentLoaded', publish, { once: true });
-  setInterval(buttons, 500);
+  buttonTimer=setInterval(buttons, 500);
   // MV3 may suspend the worker and discard a temporary fill lease. Reconcile
   // the original guard even if its worker timer did not survive suspension.
-  setInterval(()=>chrome.runtime.sendMessage({type:'configure-guard'}).catch(()=>{}),10000);
+  guardTimer=setInterval(reconcile,10000);
 })();

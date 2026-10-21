@@ -8,10 +8,11 @@ function fakeDocument(){
  const document={body,nodes,createElement:element,querySelector:()=>null,querySelectorAll:()=>[anchor],control:label=>nodes.slice().reverse().find(n=>n.getAttribute('aria-label')===label),dialog:()=>nodes.find(n=>n.tagName==='DIALOG'),button:text=>nodes.slice().reverse().find(n=>n.tagName==='BUTTON'&&n.textContent===text)};
  return document;
 }
-function fixture({manual=false,fail=false,separateNative=false,ui=false,rich=[],dropLinks=false,defaultActor=null}={}){
+function fixture({manual=false,fail=false,separateNative=false,ui=false,rich=[],dropLinks=false,defaultActor=null,conference=false}={}){
  const root=()=>({nodeType:1,isConnected:true,closest:()=>null});
  const templates=[{activityMetaId:'travel',activityMetaName:'常规差旅',ASX060401:0,behaviors:['城市间交通费','住宿','用餐补贴','市内交通补贴','交通意外险'].map((name,i)=>({behaviorMetaName:name,behaviorMetaId:String(i),behaviorDetail:[{option:{list:['BSX070306','BSX070303','BSX070305','BSX070110','BSX070109','BTSSX0102','BTSSX0402','BTSSX0403','BTSSX0404','BTSSX0409','BSX071301','BTSSX0412'].map(key=>({option:{key,title:key==='BTSSX0102'?'姓名':key}}))}}]}))}];
  const form={formId:'c3771358d145490f9e363790c0519fde',reimbursementId:'draft',state:2,totalAmount:manual?'7.00':'0.00',totalAmountOrigin:'0.00',billVOList:[nativeBill({barcode:'a',totalAmount:'10.05',ticketName:'铁路电子客票',billData:{trainNO:'G1'}})]};
+ if(conference){form.formId='c16d61165e9745b096bd0f1edac339e0';templates[0].activityMetaName='参加会议';templates[0].activityMetaCode='03';for(const name of ['会议服务','改签、退票费'])templates[0].behaviors.push({...structuredClone(templates[0].behaviors[0]),behaviorMetaName:name,behaviorMetaId:name})}
  const manualRow={key:'manual',BSX070306:'7.00',BSX070110:'手填说明'};
  if(manual)form.activitys=[{activityMetaId:'travel',ASX060401:'7.00',behaviors:[{behaviorMetaId:'0',behaviorMetaName:'城市间交通费',BSX060206:'7.00',behaviorDetail:[manualRow]}]}];
  if(defaultActor)for(const b of templates[0].behaviors)b.behaviorDetail[0].option.list.push({option:{key:'BSX070108',title:'行为人ID'}});
@@ -20,7 +21,7 @@ function fixture({manual=false,fail=false,separateNative=false,ui=false,rich=[],
  const events={},window={ReimbursementSite:require("../extension/site.js"),ReimbursementInvoiceCore:invoices,crypto:require('node:crypto').webcrypto,addEventListener:(k,f)=>events[k]=f},document=ui?fakeDocument():{querySelector:()=>null};let richData=rich.map(nativeBill);document.querySelector=selector=>selector==='iframe.iframe-box1'?{contentWindow:'details',contentDocument:{querySelector:()=>({__vue__:{sourceData:richData}})}}:null;
  vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/invoices.js','utf8'),{window,document,location:{hash:'#/reimbursementCreate',origin:'http://test'}});
  const api=window.ReimbursementInvoiceTools;let activeForm=form,count=0,watch;
- const refresh=()=>{for(const a of form.activitys||[])api.register({subTree:{el:root()},props:{tableRecord:a},setupState:{isEdit:{data:true},onAddBehaviorList:b=>a.behaviors.push(b),onAddTableList:b=>{b.behaviorDetail ||= []; b.behaviorDetail.push({key:'native-'+(++count),...(defaultActor?{BSX070108:defaultActor.id,BSX070109:defaultActor.name}:{})})}}})};
+ const refresh=()=>{for(const a of form.activitys||[])api.register({subTree:{el:root()},props:{tableRecord:a,...(conference?{componentInfo:{key:'activitys'}}:{})},setupState:{isEdit:{data:true},onAddBehaviorList:b=>a.behaviors.push(b),onAddTableList:b=>{b.behaviorDetail ||= []; b.behaviorDetail.push({key:'native-'+(++count),...(defaultActor?{BSX070108:defaultActor.id,BSX070109:defaultActor.name}:{})})}}})};
  api.bind({form:()=>activeForm,settings:{enabled:true,totals:true},raw:x=>x,watch:(fn,changed)=>{watch=changed;return ()=>{}},nextTick:async()=>{},refresh,compute:f=>{if(fail)throw Error('native failure');for(const p of core.travelPlan(f))p.target[p.key]=String((p.amount/100).toFixed(2));if(dropLinks)for(const a of f.activitys||[])for(const b of a.behaviors||[])for(const r of b.behaviorDetail||[])delete r.BSX0709;}});
  api.register(main);refresh();
  return {api,form,native,main,manualRow,document,events,setRich:b=>richData=b.map(nativeBill),notify:()=>watch(),replace:()=>activeForm={...form}};
@@ -112,6 +113,85 @@ test('undo restores replaced manual rows and original totals without saving the 
 });
 
 function insuranceBill(id,title){return nativeBill({barcode:id,billTitle:title,totalAmount:'120',ticketName:'电子发票（普通发票）',billData:{name:'',totalTax:'6.79',details:[{inx:'0',content:'航空意外险',amount:'113.21',taxAmount:'6.79'}]}})}
+test('one traveler and explicit hotel guest generate full associations without pressing split',async()=>{
+ const f=fixture({ui:true});
+ f.form.billVOList=[nativeBill({barcode:'single-train',totalAmount:'623',ticketName:'铁路电子客票',billData:{name:'测试甲',trainNO:'G1'}}),nativeBill({barcode:'single-hotel',totalAmount:'700',ticketName:'电子发票',billData:{name:'',hotel:[{inx:'0'}],summary:'入住人：测试甲 2026.10.16入住-2026.10.18离店'}})];
+ f.api.mount();f.document.button('从票据生成明细').fire('click');
+ assert.equal(f.document.button('更新费用明细').disabled,false);
+ assert.equal(f.document.control('归属人员：电子发票').value,'测试甲');
+ const p=f.api.prepare();assert.equal(p.rows[1].allocations[0].amountCents,70000);
+ await f.api.apply(p);assert.equal(f.form.totalAmount,'1323.00');
+ const hotel=f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='住宿').behaviorDetail[0];
+ assert.equal(hotel.BSX070109,'测试甲');assert.equal(hotel.BSX0709[0].BSX070804,700);
+});
+test('typing one owner immediately assigns the full amount, clearing or adding people requires review',()=>{
+ const f=fixture({ui:true});f.form.billVOList=[insuranceBill('one','单人保险')];
+ f.api.mount();f.document.button('从票据生成明细').fire('click');
+ const names=f.document.control('归属人员：单人保险');
+ names.value='测试甲';names.fire('input');assert.equal(f.document.button('更新费用明细').disabled,false);
+ assert.equal(f.document.control('分摊金额：单人保险：测试甲').value,'120.00');
+ names.value='测试乙';names.fire('input');assert.equal(f.document.button('更新费用明细').disabled,false);
+ assert.equal(f.document.control('分摊金额：单人保险：测试乙').value,'120.00');
+ names.value='测试甲、测试乙';names.fire('input');assert.equal(f.document.button('更新费用明细').disabled,true);
+ names.value='';names.fire('input');assert.equal(f.document.button('更新费用明细').disabled,true);
+});
+test('late fee OCR updates classification and invalidates old previews',async()=>{
+ const f=fixture({rich:[{barcode:'a',billData:{trainNO:'G1'}}]}),p=f.api.prepare();
+ f.setRich([{barcode:'a',billData:{trainNO:'G1',processDetail:[{content:'改签费'}]}}]);
+ await assert.rejects(f.api.apply(p),/已变化/);
+ f.main.setupState.activityOptionList[0].behaviors.push({...structuredClone(f.main.setupState.activityOptionList[0].behaviors[0]),behaviorMetaName:'改签、退票费',behaviorMetaId:'change'});
+ const next=f.api.prepare();assert.equal(next.rows[0].category,'改签、退票费');
+ await f.api.apply(next);assert.equal(f.form.totalAmount,'10.05');
+ assert.equal(f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='改签、退票费').behaviorDetail[0].BSX0709[0].BSX070804,10.05);
+});
+function reclassificationFixture(options={}){
+ const f=fixture(options),template=f.main.setupState.activityOptionList[0];
+ template.behaviors.push({...structuredClone(template.behaviors[0]),behaviorMetaName:'改签、退票费',behaviorMetaId:'change'});
+ const ticket=(barcode,total)=>nativeBill({barcode,billTitle:barcode,totalAmount:total,ticketName:'铁路电子客票',billData:{name:'测试甲',trainNO:'G1'}});
+ f.form.billVOList=[ticket('fare-out','623'),ticket('change','93.50'),ticket('fare-back','623')];
+ const oldRows=f.form.billVOList.map(b=>({BSX070306:Number(b.totalAmount),BSX070110:'原票据生成',BSX0709:[{BSX070802:b.dataId,BSX070807:b.barcode,BSX070803:'0',BSX070804:Number(b.totalAmount),BSX070811:'1'}]}));
+ const subsidy={BSX070306:720};
+ f.form.activitys=[{activityMetaId:'travel',behaviors:[{behaviorMetaName:'城市间交通费',behaviorMetaId:'0',behaviorDetail:oldRows},{behaviorMetaName:'用餐补贴',behaviorDetail:[subsidy]}]}];
+ f.form.totalAmount='2059.50';
+ const plan=()=>{const p=f.api.prepare();for(const row of p.rows){row.selected=row.bill.barcode==='change';if(row.selected)row.category='改签、退票费'}return p};
+ return {...f,oldRows,subsidy,plan};
+}
+test('moving a change fee removes only its prior traffic row, preserves fares and subsidies, and is repeatable',async()=>{
+ const f=reclassificationFixture({ui:true}),p=f.plan(),traffic=f.form.activitys[0].behaviors[0],array=traffic.behaviorDetail,retained=[array[0],array[2]];
+ const result=await f.api.apply(p);
+ assert.equal(result.total,205950);assert.equal(f.form.totalAmount,'2059.50');assert.equal(traffic.behaviorDetail,array);
+ assert.deepEqual(traffic.behaviorDetail,retained);
+ const fee=f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='改签、退票费');
+ assert.equal(fee.behaviorDetail.length,1);assert.equal(fee.behaviorDetail[0].BSX070306,93.5);assert.equal(fee.behaviorDetail[0].BSX0709[0].BSX070804,93.5);
+ assert.equal(f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='用餐补贴').behaviorDetail[0],f.subsidy);
+ await f.api.apply(f.plan());assert.equal(f.form.totalAmount,'2059.50');assert.equal(fee.behaviorDetail.length,1);
+});
+test('reclassification preview explains the one-row migration and enables update with unrelated fares unselected',()=>{
+ const f=reclassificationFixture({ui:true});f.api.mount();f.document.button('从票据生成明细').fire('click');
+ for(const name of ['fare-out','fare-back']){const check=f.document.control('生成费用：'+name);check.checked=false;check.fire('change')}
+ const select=f.document.control('费用分类：change');select.value='改签、退票费';select.fire('change');
+ assert.equal(f.document.button('更新费用明细').disabled,false);
+ const content=f.document.nodes.map(n=>n.textContent).join('\n');
+ assert.match(content,/迁移 1 条原关联明细（城市间交通费 → 改签、退票费）/);
+ assert.match(content,/其他费用保留 ¥1966.00/);assert.match(content,/¥2059.50/);
+});
+test('cross-category generation failure and undo restore exact prior rows and links',async()=>{
+ const failed=reclassificationFixture({fail:true}),before=JSON.stringify(failed.form),array=failed.form.activitys[0].behaviors[0].behaviorDetail;
+ await assert.rejects(failed.api.apply(failed.plan()),/native failure/);
+ assert.equal(JSON.stringify(failed.form),before);assert.equal(failed.form.activitys[0].behaviors[0].behaviorDetail,array);
+ const f=reclassificationFixture({ui:true}),prior=JSON.stringify(f.form);await f.api.apply(f.plan());f.api.mount();f.document.button('撤销本次生成').fire('click');
+ assert.equal(JSON.stringify(f.form),prior);
+});
+test('cross-category mixed invoice rows and inconsistent amounts are rejected without mutation',async()=>{
+ for(const kind of ['mixed','amount','barcode','support']){
+  const f=reclassificationFixture(),r=f.oldRows[1];
+  if(kind==='mixed')r.BSX0709.push({BSX070802:'unrelated',BSX070807:'other',BSX070804:1,BSX070811:'1'});
+  if(kind==='amount')r.BSX070306=100;
+  if(kind==='barcode')r.BSX0709[0].BSX070807='wrong';
+  if(kind==='support')r.BSX0709.push({BSX070802:'support',BSX070807:'evidence',BSX070804:0,BSX070811:'0'});
+  const before=JSON.stringify(f.form);await assert.rejects(f.api.apply(f.plan()),/跨分类/);assert.equal(JSON.stringify(f.form),before);
+ }
+});
 test('explicit people do not inherit another default actor ID',async()=>{
  const f=fixture({defaultActor:{id:'synthetic-actor-a',name:'测试甲'}});f.form.billVOList=[insuranceBill('out','去程保险')];const p=f.api.prepare();p.rows[0].allocations=invoices.associations.evenSplit(12000,['测试甲','测试乙','测试丙']);await f.api.apply(p);
  const rows=f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='交通意外险').behaviorDetail;
@@ -184,4 +264,20 @@ test('lodging supports stay on named paid rows and undo restores old zero-row li
 });
 test('concurrent generation cannot replace another in-flight operation or change payment allocations',async()=>{
  const f=fixture({manual:true});f.form.receivableInfo=[{actualReceivableCurrency:7,bankAccountName:'测试收款人'}];const payments=JSON.stringify(f.form.receivableInfo),p=f.api.prepare();const first=f.api.apply(p);await assert.rejects(f.api.apply(p),/正在生成/);await first;assert.equal(f.form.totalAmount,'10.05');assert.equal(JSON.stringify(f.form.receivableInfo),payments);assert.equal(f.form.activitys[0].behaviors[0].behaviorDetail.length,1);
+});
+
+test('conference template generates five linked single-owner expenses without AI or allowance presets',async()=>{
+ const f=fixture({conference:true,ui:true});
+ f.form.billVOList=[...['out','back'].map(barcode=>nativeBill({barcode,totalAmount:'623',ticketName:'铁路电子客票',billData:{name:'测试甲',trainNO:'G1'}})),nativeBill({barcode:'change',totalAmount:'93.50',ticketName:'铁路电子客票',billData:{name:'测试甲',trainNO:'G2',summary:'改签费'}}),nativeBill({barcode:'hotel',totalAmount:'700',ticketName:'电子发票',billData:{name:'',hotel:[{inx:'0'}],summary:'入住人：测试甲 2026.10.16入住'}}),nativeBill({barcode:'registration',totalAmount:'2500',ticketName:'电子发票',billData:{name:'',details:[{inx:'0',content:'*生产生活服务*会议注册费',amount:'2358.49',taxAmount:'141.51'}],totalTax:'141.51'}})];
+ f.api.mount();assert.equal(f.document.button('从票据生成明细').disabled,false);
+ const p=f.api.prepare();assert.equal(p.allowanceAllowed,false);assert.equal(p.rows[4].category,'会议服务');
+ assert.ok(p.rows.every(r=>r.allocations.length===1&&r.allocations[0].person==='测试甲'));
+ const result=await f.api.apply(p);assert.equal(result.count,5);assert.equal(f.form.totalAmount,'4539.50');
+ const rows=f.form.activitys[0].behaviors.flatMap(b=>b.behaviorDetail);assert.equal(rows.length,5);
+ assert.ok(rows.every(r=>r.BSX0709.length===1&&r.BSX0709[0].BSX070804===r.BSX070306&&r.BSX070109==='测试甲'));
+ await f.api.apply(f.api.prepare());assert.equal(f.form.totalAmount,'4539.50');
+ const q=f.api.prepare();q.allowance={enabled:true};await assert.rejects(f.api.apply(q),/不适用/);
+});
+test('conference generation still refuses readonly, submitted and unrelated forms',()=>{
+ for(const mode of ['readonly','submitted','unrelated']){const f=fixture({conference:true});if(mode==='readonly')f.main.setupState.isEdit.data=false;if(mode==='submitted')f.form.state=6;if(mode==='unrelated')f.form.formId='unknown';assert.throws(()=>f.api.prepare(),/未就绪/)}
 });

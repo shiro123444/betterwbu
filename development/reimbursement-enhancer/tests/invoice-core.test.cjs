@@ -3,6 +3,36 @@ const core = require('../extension/invoice-core.js');
 const available = core.categories;
 const invoice = (id, amount, fields = {}) => ({barcode:id, totalAmount:amount, ticketName:'电子发票（铁路电子客票）', billTitle:'车票', billData:{trainNO:'G123', ...fields}});
 
+test('fee classification reads summary and process lines, while a changed fare stays a fare',()=>{
+ for(const fields of [{summary:'改签费'},{feeType:'退票手续费'},{processDetail:[{content:'改签手续费'}]}]){
+  const row=core.plan([invoice('fee','93.50',fields)],[],available).rows[0];
+  assert.equal(row.category,'改签、退票费');assert.equal(row.amountCents,9350);assert.equal(row.selected,true);
+ }
+ const fare=core.plan([invoice('fare','623',{summary:'改签后车票，票价623元'})],[],available).rows[0];
+ assert.equal(fare.category,'城市间交通费');
+ const mixed=core.plan([invoice('mixed','700',{details:[{content:'铁路票价'},{content:'改签费'}]})],[],available).rows[0];
+ assert.equal(mixed.category,null);assert.match(mixed.reason,/多个分类/);
+});
+test('rail OCR without fee wording warns rather than guessing from amount or invoice number',()=>{
+ for(const amount of ['93.50','623']){
+  const bill={...invoice('rail',amount,{invoiceNO:'26999123456789012345'}),ticketCode:'1-034'};
+  const row=core.plan([bill],[],available).rows[0];
+  assert.equal(row.category,null);assert.equal(row.selected,false);assert.match(row.reason,/未提供票面费用类型/);
+ }
+});
+test('single owners allocate exactly, shared and ambiguous hotel guests are not inferred',()=>{
+ const hotel=(summary)=>({barcode:'hotel',ticketName:'电子发票',totalAmount:'700',billData:{hotel:[{}],summary}});
+ let rows=core.plan([invoice('fare','623',{name:'测试甲'}),hotel('入住人：测试甲 2026.10.16入住-2026.10.18离店')],[],available).rows;
+ core.autoAllocate(rows);assert.deepEqual(rows.map(r=>r.allocations),[[{person:'测试甲',amountCents:62300}],[{person:'测试甲',amountCents:70000}]]);
+ rows=core.plan([invoice('fare','623',{name:'测试甲'}),hotel('入住人：测试甲、测试乙 2026.10.16入住')],[],available).rows;
+ core.autoAllocate(rows);assert.equal(rows[1].allocations,undefined);
+ rows=core.plan([invoice('fare','623',{name:'测试甲'}),hotel('入住人：测试甲 等两人')],[],available).rows;
+ core.autoAllocate(rows);assert.equal(rows[1].allocations,undefined);
+ rows=core.plan([invoice('a','10',{name:'测试甲'}),invoice('b','10',{name:'测试乙'}),hotel('')],[],available).rows;
+ core.autoAllocate(rows);assert.equal(rows[2].allocations,undefined);
+ rows[0].allocations=[{person:'手填人员',amountCents:1000}];core.autoAllocate(rows);assert.equal(rows[0].allocations[0].person,'手填人员');
+});
+
 test('a saved sparse invoice awaits rich details instead of being rejected as a non-invoice',()=>{
  const sparse={barcode:'pending-invoice',dataId:'record-pending',ticketCode:'1-024',billTitle:'电子发票（普通发票）',totalAmount:'112.98'};
  const pending=core.plan([sparse],[],['其他']).rows[0];
@@ -65,3 +95,10 @@ test('unsafe sums fail instead of rounding a monetary total',()=>{
 test('typographic minus signs remain negative rather than losing their sign',()=>{assert.equal(core.amount('−566.92'),-56692);assert.equal(core.amount('－840.00'),-84000)});
 
 test('invoice issue date is not substituted for train departure date',()=>{const row=core.plan([invoice('a','10',{issueDate:'2026-10-10'})],[],available).rows[0];assert.equal(core.rowValues(row,['BTSSX0104']).BTSSX0104,undefined);row.bill.billData.cfrq='2026-10-11';assert.equal(core.rowValues(row,['BTSSX0104']).BTSSX0104,'2026-10-11')});
+
+test('meeting service classification and fields use invoice content rather than unrelated meeting notes',()=>{
+ const bill={barcode:'registration',ticketName:'电子发票',totalAmount:'2500',billData:{drawingCorp:'测试会议机构',summary:'测试会议',details:[{content:'*生产生活服务*会议注册费'}]}};
+ const row=core.plan([bill],[],['会议服务']).rows[0];assert.equal(row.category,'会议服务');
+ assert.deepEqual(core.rowValues(row,['BSX070103','BTSSX0603','BTSSX0641']),{BSX070103:'*生产生活服务*会议注册费',BTSSX0603:'测试会议机构',BTSSX0641:'测试会议'});
+ bill.billData.details=[{content:'办公用品'}];assert.equal(core.plan([bill],[],['会议服务']).rows[0].category,null);
+});

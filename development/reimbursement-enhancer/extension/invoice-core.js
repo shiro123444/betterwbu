@@ -5,7 +5,7 @@
   else root.ReimbursementInvoiceCore = api;
 })(typeof window === 'object' ? window : {}, function (money, associations) {
   'use strict';
-  const categories = ['城市间交通费','住宿','过路过桥','改签、退票费','交通意外险','燃油费','车辆租赁'];
+  const categories = ['城市间交通费','住宿','过路过桥','改签、退票费','交通意外险','燃油费','车辆租赁','会议服务'];
   function identifiers(bill) { return ['barcode','dataId','id'].map(k => bill?.[k]).filter(v => v != null && String(v).trim()).map(String); }
   function identity(bill) {
     const d = bill.billData || {};
@@ -13,6 +13,34 @@
     return identifiers(bill)[0] ? 'bill:' + identifiers(bill)[0] : null;
   }
   function amount(value) { if (value == null || String(value).trim() === '') return null; try { return money.cents(String(value).replace(/[−－]/g,'-')); } catch { return null; } }
+  function feeText(bill) {
+    const d=bill.billData||{}, keys=['content','itemName','feeName','feeType','chargeType','expenseType','summary','business'];
+    return [bill.ticketName,d.billTitle,bill.billTitle,...[d,...(d.details||[]),...(d.processDetail||[])].flatMap(record=>keys.map(key=>record?.[key]))].filter(v=>typeof v==='string').join(' ');
+  }
+  function invoicePeople(bill) {
+    const d=bill.billData||{};
+    if(typeof d.name==='string'&&d.name.trim())return associations.people(d.name);
+    // Only an explicit guest label supplies names; buyer, seller and bank names do not.
+    const match=String(d.summary||'').match(/(?:入住人|住宿人员|入住人员)[：:]\s*([^\d\n；;]+)/);
+    if(!match)return [];
+    const value=match[1].trim();
+    if(!/^[\p{Script=Han}·、，,\s]{2,60}$/u.test(value))throw Error('入住人员需核对');
+    const names=associations.people(value);
+    if(names.some(name=>!/^[\p{Script=Han}·]{2,20}$/u.test(name)))throw Error('入住人员需核对');
+    return names;
+  }
+  function autoAllocate(rows) {
+    const known=new Map();
+    let ambiguous=false;
+    for(const row of rows)if(!row.blocked){try{known.set(row,invoicePeople(row.bill))}catch{ambiguous=true;/* Ambiguous names need review. */}}
+    const travelers=[...new Set([...known.values()].flat())];
+    for(const [row,names]of known){
+      if(row.allocations!==undefined||row.allocationPeople!==undefined)continue;
+      const owners=names.length?names:!ambiguous&&travelers.length===1?travelers:[];
+      if(owners.length===1){row.allocationPeople=owners[0];row.allocations=associations.evenSplit(row.amountCents,owners)}
+    }
+    return rows;
+  }
   function classify(bill, available) {
     const d = bill.billData || {}, names = new Set();
     const text = [bill.ticketName || d.billTitle || bill.billTitle, d.templateGroupName, d.business, ...(d.details || []).map(x => x.content)].filter(v => typeof v === 'string').join(' ');
@@ -21,13 +49,20 @@
     const transportText = text.replace(/(?:国内)?机票航空意外险|航空(?:旅客)?意外险|交通意外险|交通保险/g, '');
     if (d.trainNO || /铁路|火车|高铁|动车|航空|机票|飞机|长途客运/.test(transportText)) names.add('城市间交通费');
     if (d.hotel?.length || /住宿|酒店|宾馆|房费/.test(text)) names.add('住宿');
-    if (/改签|退票费/.test(text)) { names.delete('城市间交通费'); names.add('改签、退票费'); }
+    const fees=feeText(bill),hasFee=/改签(?:手续)?费|退票(?:手续)?费/.test(fees);
+    if (hasFee) {
+      const mixed=(d.details||[]).some(line=>/票价|机票费|运输服务/.test(line.content||'')&&!/改签(?:手续)?费|退票(?:手续)?费/.test(line.content||''));
+      if(!mixed)names.delete('城市间交通费');
+      names.add('改签、退票费');
+    }
     if (/通行费|过路|过桥/.test(text)) names.add('过路过桥');
     if (/意外险|交通保险/.test(text)) names.add('交通意外险');
     if (/汽油|柴油|燃油|加油/.test(text)) names.add('燃油费');
     if (/车辆租赁|汽车租赁|租车费/.test(text)) names.add('车辆租赁');
+    if (/会议注册费|会议报名费|会议服务费|会议费|会务费/.test(text)) names.add('会议服务');
     if (names.size !== 1) return {category:null, reason:names.size ? '同一票据涉及多个分类，请核对拆分' : '请确认费用分类'};
     const name = [...names][0];
+    if(name==='城市间交通费'&&String(bill.ticketCode||d.billTypeCode)==='1-034'&&!/票价/.test(fees))return {category:null,reason:'铁路识别数据未提供票面费用类型，请对照原件选择“城市间交通费”或“改签、退票费”。'};
     return available.includes(name) ? {category:name, reason:''} : {category:null, reason:'当前模板没有对应分类：' + name};
   }
   function plan(selected, rich, available) {
@@ -75,17 +110,19 @@
     if (allowance?.enabled) for (const name of ['用餐补贴','市内交通补贴']) if (available.includes(name)) names.add(name);
     return [...names];
   }
-  function projection(form, activityId, rows, mode = 'replace', replaceNames = replacementCategories(rows)) {
+  function projection(form, activityId, rows, mode = 'replace', replaceNames = replacementCategories(rows), reclassified = []) {
     const before = money.travelPlan({...form,activitys:form.activitys || []});
     if (!before) throw Error('费用明细无法合计，请核对当前模板');
     let retained = 0, replaced = 0;
+    const removed=new Set(reclassified.map(m=>m.record));
     for (const a of form.activitys || []) for (const b of a.behaviors || []) {
       if (b.behaviorKey === 'summary' || b.behaviorMetaName === '总览') continue;
-      const n = money.sum(b.behaviorDetail.map(d=>({amount:d.BSX070306 ?? d.BSX070304 ?? 0})),'amount');
+      const n = money.sum(b.behaviorDetail.filter(d=>!removed.has(d)).map(d=>({amount:d.BSX070306 ?? d.BSX070304 ?? 0})),'amount');
       if (mode === 'replace' && a.activityMetaId === activityId && replaceNames.includes(b.behaviorMetaName)) replaced += n;
       else retained += n;
       if (!Number.isSafeInteger(retained) || !Number.isSafeInteger(replaced)) throw Error('金额超出可处理范围');
     }
+    for(const move of reclassified)replaced+=move.amountCents;
     const amount = retained + total(rows);
     if (!Number.isSafeInteger(amount)) throw Error('金额超出可处理范围');
     return {amount,retained,replaced,categories:replaceNames};
@@ -112,6 +149,12 @@
       for (const [target,source] of Object.entries({BTSSX0102:'name',BTSSX0111:'trainNO',BTSSX0112:'seatClass',BTSSX0113:'origin',BTSSX0118:'dest'})) if (typeof d[source] === 'string' && d[source]) values[target] = d[source];
       const date = String(d.cfrq || '');
       if (/^\d{4}-\d{2}-\d{2}(?:\s|$)/.test(date)) values.BTSSX0104 = date.slice(0,10);
+    }
+    if(row.category==='会议服务'){
+      const content=(d.details||[]).map(line=>line.content).filter(v=>typeof v==='string'&&v.trim()).join('、');
+      if(content)values.BSX070103=content;
+      if(typeof d.drawingCorp==='string'&&d.drawingCorp)values.BTSSX0603=d.drawingCorp;
+      if(d.summary||content)values.BTSSX0641=String(d.summary||content);
     }
     return Object.fromEntries(Object.entries(values).filter(([key]) => allowed.includes(key)));
   }
@@ -172,5 +215,5 @@
     }
     return {rows,amount:total(rows),days,people:people.length};
   }
-  return {categories, identifiers, identity, amount, classify, plan, total, balance, rowValues, replacementCategories, projection, allowances, stayPeriod, calendarDay, policyUrl, associations};
+  return {categories, supportsForm:money.supportsInvoiceForm, identifiers, identity, amount, classify, plan, feeText, invoicePeople, autoAllocate, total, balance, rowValues, replacementCategories, projection, allowances, stayPeriod, calendarDay, policyUrl, associations};
 });

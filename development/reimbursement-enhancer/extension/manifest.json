@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "报销系统交互优化",
-  "version": "0.13.20",
+  "version": "0.13.24",
   "minimum_chrome_version": "111",
   "description": "改善报销布局与发票加载，预览生成费用明细，复用收款资料并同步金额。",
   "permissions": [
@@ -72,7 +72,8 @@
         "layout.js",
         "wallet-feedback.js",
         "wallet-layout.js",
-        "audit-layout.js"
+        "audit-layout.js",
+        "wallet-host.js"
       ],
       "css": [
         "polish.css",
@@ -95,13 +96,15 @@
         "wallet-layout.js",
         "waiting.js",
         "workspace-theme.js",
-        "wallet-recognition-ui.js"
+        "wallet-recognition-ui.js",
+        "wallet-manager-ui.js"
       ],
       "css": [
         "polish.css",
         "workspace.css",
         "components.css",
-        "wallet-recognition.css"
+        "wallet-recognition.css",
+        "wallet-manager.css"
       ],
       "all_frames": true,
       "run_at": "document_start"
@@ -117,7 +120,8 @@
         "site.js",
         "wallet-recognition-core.js",
         "wallet-recognition.js",
-        "wallet-bridge.js"
+        "wallet-bridge.js",
+        "wallet-manager.js"
       ],
       "world": "MAIN",
       "all_frames": true,

@@ -23,3 +23,11 @@ test('verified travel schema totals only expense detail, does not count invoices
   assert.equal(core.travelPlan(form).at(-1).amount,0);
   form.formId='other';assert.equal(core.travelPlan(form),null);
 });
+
+test('only the verified travel and conference forms share invoice totals',()=>{
+ for(const formId of ['c3771358d145490f9e363790c0519fde','c16d61165e9745b096bd0f1edac339e0']){
+ const form={formId,activitys:[{behaviors:[{behaviorMetaName:'会议服务',behaviorDetail:[{BSX070306:'2500.01'}]},{behaviorKey:'summary',behaviorDetail:[{BSX070306:999}]}]}]};
+ assert.equal(core.supportsInvoiceForm(form),true);assert.equal(core.travelPlan(form).at(-1).amount,250001);
+ }
+ assert.equal(core.supportsInvoiceForm({formId:'other'}),false);
+});

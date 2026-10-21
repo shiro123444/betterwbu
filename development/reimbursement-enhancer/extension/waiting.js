@@ -49,6 +49,8 @@
   if(document.activeElement===overlay&&priorFocus?.isConnected&&!dialogOpen())priorFocus.focus({preventScroll:true});priorFocus=null;
  }
  function inspect(){
+  // The wallet has inline query state; a second overlay hides its folder controls.
+  if(document.documentElement.dataset.bwWalletModern!==undefined){hide();return}
   if(suppressed&&!active(suppressed))suppressed=null;
   const custom=[...document.querySelectorAll('.ant-spin-spinning .loadingBG')].find(active);
   const host=custom||[...document.querySelectorAll('.ant-spin-spinning .ant-spin-dot')].find(n=>active(n)&&region(n));
@@ -64,7 +66,7 @@
   position();const step=phase(text);if(title.textContent!==step[0])title.textContent=step[0];current.hint=step[1];if(status.textContent!==text)status.textContent=text;tick();
  }
  let scheduled=false;const observer=new MutationObserver(()=>{if(!scheduled){scheduled=true;queueMicrotask(()=>{scheduled=false;inspect()})}});
- function start(){observer.observe(document.documentElement,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:['class','style','hidden','aria-hidden','data-re-loader']});inspect()}
+ function start(){observer.observe(document.documentElement,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:['class','style','hidden','aria-hidden','data-re-loader','data-bw-wallet-modern']});inspect()}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();document.addEventListener('visibilitychange',inspect);
  window.addEventListener('resize',inspect);window.addEventListener('scroll',inspect,true);
  document.addEventListener('keydown',event=>{if(!current)return;if(dialogOpen()){hide();return}if(event.key==='Escape'){suppressed=current.host;hide();event.preventDefault();event.stopPropagation()}else if(event.key==='Tab'&&!current.local){event.preventDefault();overlay.focus({preventScroll:true})}},true);

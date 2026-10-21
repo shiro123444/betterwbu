@@ -4,6 +4,8 @@
   else root.ReimbursementEnhancerCore = api;
 })(typeof window === 'object' ? window : {}, function () {
   'use strict';
+  const supportedInvoiceForms = ['c3771358d145490f9e363790c0519fde','c16d61165e9745b096bd0f1edac339e0'];
+  function supportsInvoiceForm(form) { return supportedInvoiceForms.includes(form?.formId); }
   function cents(value) {
     let s = String(value ?? '').trim().replace(/[¥￥\s]/g, '');
     if (!s) return 0;
@@ -31,9 +33,9 @@
     const match = w => ({ matchMode: '8', branch_bank_name: w });
     return { and: [{ or: [match(words[0])], and: words.slice(1).map(match) }] };
   }
-  // This is deliberately limited to this school's verified travel form.
+  // Only the school's inspected travel and conference templates share these totals.
   function travelPlan(form) {
-    if (form.formId !== 'c3771358d145490f9e363790c0519fde' || !Array.isArray(form.activitys)) return null;
+    if (!supportsInvoiceForm(form) || !Array.isArray(form.activitys)) return null;
     const groups = []; let total = 0;
     for (const activity of form.activitys) {
       if (!Array.isArray(activity.behaviors)) return null;
@@ -53,5 +55,5 @@
     groups.push({ target: form, key: 'totalAmount', amount: total });
     return groups;
   }
-  return { cents, sum, condition, travelPlan };
+  return { cents, sum, condition, travelPlan, supportsInvoiceForm };
 });
