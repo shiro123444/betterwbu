@@ -281,3 +281,12 @@ test('conference template generates five linked single-owner expenses without AI
 test('conference generation still refuses readonly, submitted and unrelated forms',()=>{
  for(const mode of ['readonly','submitted','unrelated']){const f=fixture({conference:true});if(mode==='readonly')f.main.setupState.isEdit.data=false;if(mode==='submitted')f.form.state=6;if(mode==='unrelated')f.form.formId='unknown';assert.throws(()=>f.api.prepare(),/未就绪/)}
 });
+
+test('native Other booking fees appear in the picker, generate full notes and links, and update without duplication',async()=>{
+ const f=fixture({ui:true});f.main.setupState.activityOptionList[0].behaviors.push({...structuredClone(f.main.setupState.activityOptionList[0].behaviors[0]),behaviorMetaName:'其他',behaviorMetaId:'other'});
+ f.form.billVOList=[nativeBill({barcode:'booking',totalAmount:'50.00',ticketName:'电子发票（普通发票）',billData:{invoiceNO:'booking-invoice',totalAmount:'50.00',totalTax:'2.83',details:[{inx:'0',content:'代订保险费',amount:'18.87',taxAmount:'1.13'},{inx:'1',content:'订票服务费',amount:'28.30',taxAmount:'1.70'}]}})];
+ const p=f.api.prepare();assert.equal(p.rows[0].category,'其他');assert.equal(p.rows[0].selected,true);assert.equal(p.rows[0].allocations[0].amountCents,5000);await f.api.apply(p);
+ const row=f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='其他').behaviorDetail[0];assert.equal(row.BSX070306,50);assert.match(row.BSX070110,/代订手续费.*20.00元.*30.00元/);assert.equal(row.BSX0709.length,2);assert.equal(row.BSX0709.reduce((n,l)=>n+Number(l.BSX070804),0),50);
+ await f.api.apply(f.api.prepare());assert.equal(f.form.totalAmount,'50.00');assert.equal(f.form.activitys[0].behaviors.find(b=>b.behaviorMetaName==='其他').behaviorDetail.length,1);
+ f.api.mount();f.document.button('从票据生成明细').fire('click');assert.ok(f.document.nodes.some(n=>n.tagName==='OPTION'&&n.value==='其他'&&n.textContent==='其他（含代订手续费）'));
+});

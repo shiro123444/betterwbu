@@ -62,3 +62,9 @@ test('list view, print and audit buttons keep native handlers and disabled state
  d.querySelector('.commonTable').append(d.createElement('span'));await new Promise(r=>setTimeout(r,40));assert.equal(buttons[1].querySelectorAll('[data-re-action-label]').length,1);
  enabled=false;await changed();buttons.forEach((n,i)=>assert.equal(n.firstChild,originals[i]));assert.equal(buttons[2].disabled,true);assert.deepEqual(clicks,[1,1,0]);w.close();
 });
+
+test('decorated ghost report buttons pair blue text with a solid white background',()=>{
+ const {JSDOM}=require('jsdom');const css=fs.readFileSync(__dirname+'/../extension/polish.css','utf8');
+ const native='.ant-btn-primary.ant-btn-background-ghost{color:#fff!important;background:transparent!important}';
+ for(const order of [[native,css]]){const dom=new JSDOM('<html data-re-visual="true"><head></head><body><button class="ant-btn ant-btn-primary ant-btn-background-ghost" data-re-action="primary"><span>稽核报告</span></button></body></html>');try{const d=dom.window.document;for(const text of order){const s=d.createElement('style');s.textContent=text;d.head.append(s)}const style=dom.window.getComputedStyle(d.querySelector('button'));assert.equal(style.color,'rgb(23, 101, 232)');assert.equal(style.backgroundColor,'rgb(255, 255, 255)')}finally{dom.window.close()}}
+});

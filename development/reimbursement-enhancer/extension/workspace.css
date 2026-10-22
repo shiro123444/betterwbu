@@ -51,6 +51,10 @@ html[data-bw-ui="true"] .ant-layout-sider .ant-layout-sider-trigger {min-height:
 html[data-bw-ui="true"] [data-re-audit-warnings="true"],html[data-bw-ui="true"] [data-re-audit-layout="true"] :is(.shrinkIcon,.shrinkIcon2) {display:none!important}
 [data-bw-workspace] [data-re-audit-progress="true"] {padding:20px!important;border:1px solid var(--bw-line);border-radius:var(--bw-radius);background:#fff;width:100%!important;min-width:0;box-sizing:border-box}
 [data-bw-workspace] [data-re-audit-progress="true"] :is(.contain,.timeline-content,.ant-tabs-content) {height:auto!important;max-height:none!important;overflow:visible!important}
+/* A hidden warning pane no longer occupies the native animated tab strip. */
+[data-bw-workspace] [data-re-audit-progress="true"] .ant-tabs-content {display:block!important;margin-left:0!important;transform:none!important}
+[data-bw-workspace] [data-re-audit-progress="true"] .ant-tabs-content>.ant-tabs-tabpane {width:100%!important;flex:none!important}
+[data-bw-workspace] [data-re-audit-progress="true"] .ant-tabs-content>.ant-tabs-tabpane:not(.ant-tabs-tabpane-active) {display:none!important}
 html[data-bw-ui="true"] .layout-content>.top-desc {display:flex!important;flex-wrap:wrap;align-items:center;gap:16px;min-height:96px;height:auto!important;padding:20px!important;margin:0 0 20px!important;border-radius:var(--bw-radius)!important;overflow:visible!important;box-sizing:border-box}
 html[data-bw-ui="true"] .layout-content>.top-desc>.state {position:static!important;clip-path:none!important;transform:none!important;width:auto!important;min-width:0;height:auto!important;padding:8px 12px!important;border-radius:var(--bw-radius)!important;background:#edf4ff!important;color:#1765e8!important;line-height:1.5!important}
 html[data-bw-ui="true"] .layout-content>.top-desc>.state[data-re-audit-failed="true"] {background:#fff0ef!important;color:#b83434!important}
@@ -94,7 +98,12 @@ html[data-bw-ui="true"] :is(.reimbursementCreate,.ant-modal,.re-invoice-dialog) 
 [data-bw-workspace] .ant-select-selection-item,[data-bw-workspace] .ant-select-selection-placeholder {font-size:16px!important}
 [data-bw-workspace] textarea.ant-input {min-height:96px!important;resize:vertical}
 [data-bw-workspace] :is(button.ant-btn,.re-basic-shortcut button,.re-basic-shortcut select) {min-height:42px!important;height:auto!important;font-size:15px!important;white-space:normal!important;line-height:24px!important}
-[data-bw-workspace] .btn:has([data-re-action]) {min-height:0!important;padding:0 0 16px!important;gap:8px!important;justify-content:flex-start!important}
+/* Expanded icon actions need normal flow, not the native one-line icon offsets. */
+[data-bw-workspace] .title-box:has(>.btn [data-re-action]) {display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;padding:0!important;box-sizing:border-box}
+[data-bw-workspace] .btn:has([data-re-action]) {display:flex!important;flex-wrap:wrap!important;align-items:center!important;position:static!important;float:none!important;transform:none!important;inset:auto!important;width:100%!important;max-width:100%!important;min-width:0!important;height:auto!important;min-height:0!important;margin:0!important;padding:0 0 16px!important;gap:8px!important;justify-content:flex-start!important;line-height:normal!important;box-sizing:border-box}
+[data-bw-workspace] .btn:has([data-re-action])>* {min-width:0!important;max-width:100%!important;flex:0 1 auto;box-sizing:border-box}
+[data-bw-workspace] .btn [data-re-action] {margin:0!important;white-space:normal!important;overflow-wrap:anywhere}
+
 [data-bw-workspace] [data-re-action] {min-height:var(--bw-control)!important;padding:9px 12px!important;font-size:15px!important;line-height:22px!important}
 [data-bw-workspace] .table-level2-box {min-width:0!important;width:100%!important;max-width:100%!important;margin:12px 0!important;box-sizing:border-box}
 [data-bw-workspace] .table-level2-box>.ant-tabs {display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box}
@@ -247,13 +256,9 @@ html[data-bw-ui="true"] .ant-layout-sider .ant-menu-submenu-title>.ant-menu-titl
 
 /* One replacement toggle, in normal flow. The old images/footer are hidden
    only after the new React button commits; native click handlers remain. */
-.bw-sidebar-toggle-host{display:flex;align-items:center;justify-content:flex-end;min-height:52px;padding:0 0 8px;box-sizing:border-box;width:100%;flex:none}
-.bw-sidebar-toggle{width:42px;height:42px;padding:10px;color:var(--bw-muted);background:#fff;border-color:var(--bw-line);border-radius:8px}
-.bw-sidebar-toggle:hover{color:var(--bw-blue);background:#edf4ff;border-color:#bdd3f5}
-.bw-sidebar-toggle svg{width:20px;height:20px;flex:none}
+/* Toggle sizing and visuals are owned by src/components.css. */
 html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"] [data-bw-sidebar-native="true"]{display:none!important}
 html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed{flex:0 0 72px!important;width:72px!important;min-width:72px!important;max-width:72px!important}
-html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .bw-sidebar-toggle-host{justify-content:center}
 html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-submenu-title{justify-content:center!important;gap:0!important;padding:6px 2px!important;font-size:0!important;line-height:0!important;white-space:nowrap!important}
 html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-submenu-title:before{margin:0 auto!important}
 html[data-bw-ui="true"] .ant-layout-sider[data-bw-sidebar-ready="true"].ant-layout-sider-collapsed .ant-menu-submenu-title>.ant-menu-title-content{position:absolute;width:1px!important;height:1px;clip-path:inset(50%);overflow:hidden}

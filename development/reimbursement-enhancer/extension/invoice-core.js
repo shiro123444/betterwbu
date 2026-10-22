@@ -5,7 +5,7 @@
   else root.ReimbursementInvoiceCore = api;
 })(typeof window === 'object' ? window : {}, function (money, associations) {
   'use strict';
-  const categories = ['城市间交通费','住宿','过路过桥','改签、退票费','交通意外险','燃油费','车辆租赁','会议服务'];
+  const categories = ['其他','代订手续费','城市间交通费','住宿','过路过桥','改签、退票费','交通意外险','燃油费','车辆租赁','会议服务'];
   function identifiers(bill) { return ['barcode','dataId','id'].map(k => bill?.[k]).filter(v => v != null && String(v).trim()).map(String); }
   function identity(bill) {
     const d = bill.billData || {};
@@ -17,6 +17,14 @@
     const d=bill.billData||{}, keys=['content','itemName','feeName','feeType','chargeType','expenseType','summary','business'];
     return [bill.ticketName,d.billTitle,bill.billTitle,...[d,...(d.details||[]),...(d.processDetail||[])].flatMap(record=>keys.map(key=>record?.[key]))].filter(v=>typeof v==='string').join(' ');
   }
+  const bookingPattern=/代订(?:手续|服务)?费|订票(?:服务|手续)费|机票代理费|票务服务费|代订保险(?:费)?/;
+  function bookingDescription(bill) {
+    if(!bookingPattern.test(feeText(bill)))return '';
+    const d=bill.billData||{};
+    const lines=(d.details?.length?d.details:d.processDetail||[]).map(line=>{const content=String(line.content||'').replace(/^\*[^*]+\*/,'');const net=amount(line.amount),tax=amount(line.taxAmount);return content+(net!=null&&tax!=null?' '+((net+tax)/100).toFixed(2)+'元':'')}).filter(Boolean).join('；');
+    return '代订手续费：'+(d.summary||lines||feeText(bill));
+  }
+  function categoryLabel(name){return name==='其他'?'其他（含代订手续费）':name}
   function invoicePeople(bill) {
     const d=bill.billData||{};
     if(typeof d.name==='string'&&d.name.trim())return associations.people(d.name);
@@ -54,6 +62,11 @@
       const mixed=(d.details||[]).some(line=>/票价|机票费|运输服务/.test(line.content||'')&&!/改签(?:手续)?费|退票(?:手续)?费/.test(line.content||''));
       if(!mixed)names.delete('城市间交通费');
       names.add('改签、退票费');
+    }
+    if(bookingPattern.test(fees)){
+      const title=[bill.ticketName,bill.billTitle,d.billTitle].filter(Boolean).join(' '),mixed=/铁路电子客票|航空运输电子客票|客票行程单/.test(title)||(d.details||[]).some(line=>/票价|机票费|运输服务/.test(line.content||'')&&!bookingPattern.test(line.content||''));
+      if(!mixed)names.delete('城市间交通费');
+      names.add(available.includes('代订手续费')?'代订手续费':available.includes('其他')?'其他':'代订手续费');
     }
     if (/通行费|过路|过桥/.test(text)) names.add('过路过桥');
     if (/意外险|交通保险/.test(text)) names.add('交通意外险');
@@ -150,6 +163,7 @@
       const date = String(d.cfrq || '');
       if (/^\d{4}-\d{2}-\d{2}(?:\s|$)/.test(date)) values.BTSSX0104 = date.slice(0,10);
     }
+    if(['其他','代订手续费'].includes(row.category)){const description=bookingDescription(row.bill);if(description){values.BSX070103=description;values.BSX070110+='；'+description}}
     if(row.category==='会议服务'){
       const content=(d.details||[]).map(line=>line.content).filter(v=>typeof v==='string'&&v.trim()).join('、');
       if(content)values.BSX070103=content;
@@ -215,5 +229,5 @@
     }
     return {rows,amount:total(rows),days,people:people.length};
   }
-  return {categories, supportsForm:money.supportsInvoiceForm, identifiers, identity, amount, classify, plan, feeText, invoicePeople, autoAllocate, total, balance, rowValues, replacementCategories, projection, allowances, stayPeriod, calendarDay, policyUrl, associations};
+  return {categories, categoryLabel, bookingDescription, supportsForm:money.supportsInvoiceForm, identifiers, identity, amount, classify, plan, feeText, invoicePeople, autoAllocate, total, balance, rowValues, replacementCategories, projection, allowances, stayPeriod, calendarDay, policyUrl, associations};
 });

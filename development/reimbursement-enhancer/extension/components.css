@@ -143,9 +143,9 @@ html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) :is(.ant-inp
 html[data-bw-ui=true] :where(.layout-content,.file-page,.ant-modal) :is(.ant-form-item-has-error,.has-error) .ant-input-affix-wrapper>input.ant-input{border:0!important}
 
 /* Navigation controls occupy the sidebar itself in both states. */
-.bw-sidebar-toggle-host{justify-content:center;min-height:60px;padding:8px 0 12px;border-bottom:1px solid #edf0f4;margin-bottom:8px}
-.bw-sidebar-toggle{display:flex;align-items:center;justify-content:flex-start;gap:10px;width:100%;min-width:0;height:44px;padding:10px 12px;font:500 14px/22px system-ui,"Microsoft YaHei",sans-serif;color:#526075;background:#f8fafc;border:1px solid #e2e6ec;border-radius:8px}
-.bw-sidebar-toggle-label{white-space:nowrap}
+.bw-sidebar-toggle-host{display:flex;align-items:center;justify-content:center;width:100%;max-width:100%;min-width:0;box-sizing:border-box;flex:none;min-height:60px;padding:8px 0 12px;border-bottom:1px solid #edf0f4;margin-bottom:8px}
+.bw-sidebar-toggle{display:flex;align-items:center;justify-content:flex-start;gap:10px;width:100%;max-width:100%;min-width:0;box-sizing:border-box;height:44px;padding:10px 12px;font:500 14px/22px system-ui,"Microsoft YaHei",sans-serif;color:#526075;background:#f8fafc;border:1px solid #e2e6ec;border-radius:8px}
+.bw-sidebar-toggle-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ant-layout-sider-collapsed .bw-sidebar-toggle{justify-content:center;width:44px;padding:10px}
 .ant-layout-sider-collapsed .bw-sidebar-toggle-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
 .bw-fill-menu{margin:8px 0!important;padding:0!important;list-style:none;min-width:0}

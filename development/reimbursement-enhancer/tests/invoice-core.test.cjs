@@ -102,3 +102,12 @@ test('meeting service classification and fields use invoice content rather than 
  assert.deepEqual(core.rowValues(row,['BSX070103','BTSSX0603','BTSSX0641']),{BSX070103:'*生产生活服务*会议注册费',BTSSX0603:'测试会议机构',BTSSX0641:'测试会议'});
  bill.billData.details=[{content:'办公用品'}];assert.equal(core.plan([bill],[],['会议服务']).rows[0].category,null);
 });
+
+test('booking fees use a dedicated native category or Other, preserve all invoice lines, and do not become air fare',()=>{
+ const bill={ticketName:'电子发票（普通发票）',billData:{details:[{content:'*生产生活服务*代订保险费',amount:'18.87',taxAmount:'1.13'},{content:'*生产生活服务*订票服务费',amount:'28.30',taxAmount:'1.70'}]}};
+ assert.equal(core.classify(bill,['城市间交通费','其他']).category,'其他');assert.equal(core.classify(bill,['代订手续费','其他']).category,'代订手续费');assert.match(core.classify(bill,['城市间交通费']).reason,/没有对应分类.*代订手续费/);
+ assert.equal(core.categoryLabel('其他'),'其他（含代订手续费）');assert.match(core.bookingDescription(bill),/代订保险费 20.00元；订票服务费 30.00元/);
+ const row={kind:'invoice',title:'服务票',bill,category:'其他',amountCents:5000,taxCents:283};const fields=core.rowValues(row,['BSX070306','BSX070103','BSX070110']);assert.equal(fields.BSX070306,50);assert.match(fields.BSX070103,/20.00元.*30.00元/);assert.match(fields.BSX070110,/代订手续费/);
+ const mixed={...bill,billData:{details:[...bill.billData.details,{content:'机票费',amount:'500',taxAmount:'0'}]}};assert.equal(core.classify(mixed,['城市间交通费','其他']).category,null);assert.match(core.classify(mixed,['城市间交通费','其他']).reason,/多个分类/);
+ assert.equal(core.classify({billData:{details:[{content:'普通手续费'}]}},['其他']).category,null);
+});

@@ -33,3 +33,12 @@ test('disabled native target cannot be triggered through the new sidebar button'
   f.d.querySelector('.shrinkIcon').setAttribute('aria-disabled','true');await settle();const b=f.d.querySelector('.bw-sidebar-toggle');assert.equal(b.disabled,true);b.click();assert.equal(f.counts.close,0);
  }finally{f.close()}
 });
+
+test('sidebar text-button sizing survives reversed stylesheet order and remains compact when collapsed',()=>{
+ const styles=['workspace.css','components.css'].map(name=>fs.readFileSync(__dirname+'/../extension/'+name,'utf8'));
+ for(const ordered of [styles,[...styles].reverse()]){
+  const dom=new JSDOM('<html data-bw-ui="true"><head></head><body><aside class="ant-layout-sider" data-bw-sidebar-ready="true"><div class="bw-sidebar-toggle-host"><button class="bw-button bw-sidebar-toggle"><svg></svg><span class="bw-sidebar-toggle-label">收起侧栏</span></button></div></aside></body></html>');
+  try{const w=dom.window,d=w.document;for(const css of ordered){const style=d.createElement('style');style.textContent=css;d.head.append(style)}const button=d.querySelector('button'),host=d.querySelector('.bw-sidebar-toggle-host');assert.equal(w.getComputedStyle(button).width,'100%');assert.equal(w.getComputedStyle(button).boxSizing,'border-box');assert.equal(w.getComputedStyle(host).justifyContent,'center');d.querySelector('aside').classList.add('ant-layout-sider-collapsed');assert.equal(w.getComputedStyle(button).width,'44px');assert.equal(w.getComputedStyle(button.lastElementChild).clipPath,'inset(50%)');
+  }finally{dom.window.close()}
+ }
+});

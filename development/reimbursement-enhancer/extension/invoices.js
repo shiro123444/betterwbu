@@ -37,7 +37,7 @@
     }
     return JSON.stringify(bills.map(b=>entry(b)));
   }
-  function note(row) { if (row.kind === 'allowance') return '由补贴计算生成：' + row.title + '；标准：' + row.rate + '元/天；不补贴：' + row.excludedDays + '天；地区：' + row.region; return '由票据生成：' + row.title + (row.person?'；归属：'+row.person:'') + '；票据编号：' + (row.sources?.map(s=>s.barcode).join('、') || row.bill.barcode || row.bill.billData?.invoiceNO || row.identity); }
+  function note(row) { if (row.kind === 'allowance') return '由补贴计算生成：' + row.title + '；标准：' + row.rate + '元/天；不补贴：' + row.excludedDays + '天；地区：' + row.region; return '由票据生成：' + row.title + (['其他','代订手续费'].includes(row.category)&&core.bookingDescription(row.bill)?'；'+core.bookingDescription(row.bill):'') + (row.person?'；归属：'+row.person:'') + '；票据编号：' + (row.sources?.map(s=>s.barcode).join('、') || row.bill.barcode || row.bill.billData?.invoiceNO || row.identity); }
   function existing(form,row, excludeActivityId) {
     for (const a of form.activitys || []) for (const b of a.behaviors || []) for (const d of b.behaviorDetail || []) {
       if (excludeActivityId !== undefined && a.activityMetaId === excludeActivityId) continue;
@@ -286,11 +286,11 @@
     for(const row of preview.rows){
       const item=el('div');item.className='re-invoice-row';
       const check=el('input');check.type='checkbox';check.checked=row.selected;check.disabled=row.blocked;check.setAttribute('aria-label','生成费用：'+row.title);
-      const title=el('div',row.title);const suffix=String(row.bill.billData?.invoiceNO||row.bill.barcode||'').slice(-4);if(suffix)title.append(el('small','票号末四位 '+suffix));const issue=el('small',row.reason||row.associationError||'');title.append(issue);
+      const title=el('div',row.title);const suffix=String(row.bill.billData?.invoiceNO||row.bill.barcode||'').slice(-4);if(suffix)title.append(el('small','票号末四位 '+suffix));const issue=el('small',row.reason||row.associationError||core.bookingDescription(row.bill)||'');title.append(issue);
       const select=el('select');select.setAttribute('aria-label','费用分类：'+row.title);select.disabled=row.blocked;const blank=el('option','选择分类');blank.value='';select.append(blank);
-      for(const name of preview.available){const o=el('option',name);o.value=name;select.append(o)}select.value=row.category || '';
+      for(const name of preview.available){const o=el('option',core.categoryLabel(name));o.value=name;select.append(o)}select.value=row.category || '';
       let allocations;
-      check.addEventListener('change',()=>{row.touched=true;row.selected=check.checked;if(allocations)allocations.hidden=!row.selected;refresh()});select.addEventListener('change',()=>{row.touched=true;row.category=select.value || null;row.reason=row.category?'':core.classify(row.bill,preview.available).reason||'请选择费用分类';issue.textContent=row.reason||row.associationError||'';row.selected=!!row.category;check.checked=row.selected;if(allocations){allocations.hidden=!row.selected;allocations.dataset.category=row.category}refresh()});
+      check.addEventListener('change',()=>{row.touched=true;row.selected=check.checked;if(allocations)allocations.hidden=!row.selected;refresh()});select.addEventListener('change',()=>{row.touched=true;row.category=select.value || null;row.reason=row.category?'':core.classify(row.bill,preview.available).reason||'请选择费用分类';issue.textContent=row.reason||row.associationError||core.bookingDescription(row.bill)||'';row.selected=!!row.category;check.checked=row.selected;if(allocations){allocations.hidden=!row.selected;allocations.dataset.category=row.category}refresh()});
       const value=el('span',row.amountCents==null?'待核对':'¥'+(row.amountCents/100).toFixed(2));value.className='re-invoice-amount';
       item.append(check,title,select,value);(row.blocked?excludedList:list).append(item);
       if(!row.blocked){allocations=allocationEditor(row,preview.rows,refresh);allocations.hidden=!row.selected;list.append(allocations)}

@@ -9,6 +9,9 @@
 [data-re-action-kind="button"]>i,[data-re-action-kind="button"]>svg:not([data-re-action-icon]) {display:none!important}
 [data-re-action="primary"] {color:#fff!important;background:#2878ff!important;border-color:#2878ff!important}
 [data-re-action="primary"]:hover {background:#1765e8!important;border-color:#1765e8!important}
+/* Native ghost buttons can force a transparent background over primary white text. */
+html[data-re-visual="true"] button.ant-btn.ant-btn-background-ghost[data-re-action] {color:#1765e8!important;background:#fff!important;border-color:#2878ff!important}
+html[data-re-visual="true"] button.ant-btn.ant-btn-background-ghost[data-re-action]:hover:not(:disabled):not([aria-disabled="true"]) {color:#1455bd!important;background:#edf4ff!important;border-color:#1765e8!important}
 [data-re-category-original="true"][data-re-action],[data-re-hidden-export="true"][data-re-action] {display:none!important}
 [data-re-action="secondary"]:hover {color:#1765e8!important;border-color:#1765e8!important;background:#f5f9ff!important}
 [data-re-action]:focus-visible {outline:3px solid #91caff;outline-offset:2px}
