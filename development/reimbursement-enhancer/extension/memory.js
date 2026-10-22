@@ -25,8 +25,11 @@
  function close(){menu?.remove();menu=null}
  async function capture(input){const r=await request('describe',input.dataset.reMemoryId);if(r?.recipient?.entry&&permitted(r.recipient))await remember(r.recipient);else await remember(r?.descriptor)}
  async function show(input,all=false){
-  const token=++showSequence;currentInput=input;close();const response=await request('describe',input.dataset.reMemoryId);let d=response?.descriptor,bundle=false;
-  if(!core?.recall||token!==showSequence||currentInput!==input||!input.isConnected||!permitted(d))return;
+  const token=++showSequence;currentInput=input;close();
+  // Recipient templates are opt-in: ordinary focus/typing must stay in the native name field.
+  if(input.dataset.reMemoryKey==='bankAccountName'&&!all)return;
+  const response=await request('describe',input.dataset.reMemoryId);let d=response?.descriptor,bundle=false;
+  if(!core?.recall||token!==showSequence||currentInput!==input||!input.isConnected||document.activeElement!==input||!permitted(d))return;
   let entries=core.recall(database,d).filter(e=>d.key==='bankAccount'||e.label.includes(input.value.trim()));
   if(d.key==='bankAccountName'&&permitted(response.recipient)){
    const groups=core.library(database,core.recipientScope(response.recipient.scope)).filter(e=>all||e.name.includes(input.value.trim()));

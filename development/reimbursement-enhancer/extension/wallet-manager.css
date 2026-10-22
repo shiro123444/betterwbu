@@ -56,3 +56,22 @@ html[data-bw-wallet-modern] .bill-item{max-width:none!important}
 .bw-wallet-button[hidden]{display:none!important}
 html[data-bw-wallet-modern] .ant-spin-blur:after{pointer-events:none!important}
 html[data-bw-wallet-modern] .re-wait-overlay{display:none!important}
+/* Keep controls and status bounded; the invoice region owns the remaining space. */
+html[data-bw-wallet-modern] .file-page{grid-template-columns:clamp(168px,var(--bw-wallet-sidebar-width,224px),min(360px,38%)) minmax(0,1fr)}
+.bw-wallet-sidebar{position:relative;overflow:visible;min-width:0}
+.bw-wallet-sidebar-resizer{position:absolute;right:-15px;top:0;bottom:0;width:10px;cursor:col-resize;touch-action:none;user-select:none;border-radius:5px;z-index:2}
+.bw-wallet-sidebar-resizer:after{content:'';position:absolute;left:4px;top:0;bottom:0;width:2px;background:transparent}
+.bw-wallet-sidebar-resizer:is(:hover,:focus-visible,[data-dragging]):after{background:#74a4ed}
+.bw-wallet-sidebar-resizer:focus-visible{outline:2px solid #bfd5f7;outline-offset:1px}
+html[data-bw-wallet-modern] .file-tabs{order:0;flex:0 0 auto;gap:10px!important;padding-bottom:10px!important;margin-bottom:10px!important}
+html[data-bw-wallet-modern] .re-recognition-results{order:1;flex:0 0 auto;max-width:100%}
+html[data-bw-wallet-modern] .file-content-wrap>.bw-wallet-load-state{order:2}
+html[data-bw-wallet-modern] .file-checkbox-group{order:3;flex:1 1 0!important;min-height:min(180px,30dvh)!important}
+html[data-bw-wallet-modern] .file-upload-fixed{order:4}
+html[data-bw-wallet-modern] .file-search{max-height:20dvh!important;overflow:auto;overscroll-behavior:contain}
+html[data-bw-wallet-modern] .bw-wallet-heading>div:first-child{flex:1;min-width:0}
+html[data-bw-wallet-modern] .bw-wallet-heading h1{font-size:clamp(18px,1.7vw,23px)}
+html[data-bw-wallet-modern] .file-tabs>.tabs-tool{max-width:100%;min-width:0}
+@media(max-width:850px){html[data-bw-wallet-modern] .file-page{grid-template-columns:clamp(168px,var(--bw-wallet-sidebar-width,180px),min(280px,35%)) minmax(0,1fr)}.bw-wallet-heading{align-items:flex-start;flex-wrap:wrap}.bw-wallet-heading-tools{gap:6px}.bw-wallet-sidebar-resizer{right:-11px}}
+@media(max-height:650px){html[data-bw-wallet-modern] .file-page{gap:6px 18px!important;padding-top:10px!important;padding-bottom:10px!important}html[data-bw-wallet-modern] .file-tabs{gap:6px!important;padding-bottom:6px!important;margin-bottom:6px!important}.re-recognition-results{margin-bottom:6px}.re-recognition-body{max-height:20dvh}html[data-bw-wallet-modern] .file-tips-wrap{max-height:32px;overflow:hidden}}
+@media(max-width:560px){html[data-bw-wallet-modern] .file-page>.bw-wallet-sidebar{max-height:150px}.bw-wallet-sidebar-resizer{display:none}.bw-wallet-sidebar-title{min-height:32px}.bw-wallet-folder{min-height:38px}.bw-wallet-heading-tools .bw-wallet-button{padding:4px 7px;min-height:32px}}
