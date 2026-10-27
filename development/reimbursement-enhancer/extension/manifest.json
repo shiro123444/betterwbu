@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "报销系统交互优化",
-  "version": "0.13.31",
+  "version": "0.13.32",
   "minimum_chrome_version": "111",
   "description": "改善报销布局与发票加载，预览生成费用明细，复用收款资料并同步金额。",
   "permissions": [
