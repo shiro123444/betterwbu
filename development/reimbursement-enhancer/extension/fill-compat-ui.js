@@ -40,6 +40,7 @@
       reportArea.replaceChildren();
       const lines = [(report.stateName || "后台状态 " + report.state) + " · " + money(report.total), "填报记录：" + (report.fillRecorded ? "已记录" : "未记录") + " · 生成结果：" + (generationOutcome?.success === true ? "成功" : generationOutcome?.success === false ? "失败" : "未确认"), "费用 " + money(report.expenseTotal) + " · 实收 " + money(report.receiptTotal), report.auditKnown ? "稽核：" + report.violations + " 条违规，" + report.warnings + " 条提醒" : "稽核结果尚未读取", "打印金额：" + money(report.printTotal)];
       for (const text of lines) reportArea.append(node("p", text, "muted"));
+      if (report.laborTax) reportArea.append(node("p", "劳务费税前 " + money(report.laborTax.gross) + " · 税后 " + money(report.laborTax.net) + " · 差额 " + money(report.laborTax.difference) + "。提交时确认当前金额后继续，不按普通金额不一致拦截；学校原系统仍会校验。", "muted"));
       for (const text of report.issues || []) reportArea.append(node("p", text, "fill-compat-issue"));
       for (const [title,issues] of [["当前页面明细预检（含未保存修改）",report.currentDetailIssues],["后台已保存明细预检",report.detailIssues]]) {
         if (!Array.isArray(issues)) continue;
