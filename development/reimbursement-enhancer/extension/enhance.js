@@ -156,6 +156,7 @@
     if (typeof vue.reactive !== 'function' || typeof vue.computed !== 'function') { vue = null; return false; }
     settings = vue.reactive(settings);
     controller = vue.reactive(requireModule('d3ae').a); status.compatible = true;
+    window.ReimbursementLaborTax?.install({document,window,location,form:()=>controller.form,enabled:()=>settings.enabled});
     window.ReimbursementFillCompat?.bind({form:()=>controller.form,enabled:()=>settings.enabled&&settings.totals,nextTick:vue.nextTick,refresh:tick,http:requireModule('d354')?.a,bills:()=>window.ReimbursementInvoiceTools?.readBills?.()||[],readDraft:id=>requireModule('351f').o({id}),readAudit:id=>requireModule('351f').k({reimbId:id})});
     window.ReimbursementInvoiceTools?.bind({
       form:()=>controller.form, settings, raw:vue.toRaw, nextTick:vue.nextTick, watch:vue.watch, refresh:tick,

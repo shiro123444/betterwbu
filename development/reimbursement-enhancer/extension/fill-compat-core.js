@@ -1,6 +1,7 @@
 (function(root) {
   "use strict";
   const preflight = typeof module === "object" && module.exports ? require("./expense-preflight.js") : root.ReimbursementExpensePreflight;
+  const laborTax = typeof module === "object" && module.exports ? require("./labor-tax.js") : root.ReimbursementLaborTax;
   const fields = ["activitys", "receivableInfo", "paymentInfo", "gwkxfxq", "budgetInfo", "assocDataInfo2", "reversedWriteOffInfo", "provisionReversedWriteOffInfo", "totalAmount", "totalAmountOrigin", "payAmount", "payAmountOrigin", "actualPayAmount", "actualPayAmountOrigin", "chargeAmount", "chargeAmountOrigin", "writeOffAmount", "writeOffAmountOrigin", "totalDeductTax", "totalDeductTaxTicket", "applyReason", "voucherNum", "SSQK", "SSQK_object", "selectActivityId", "zmr", "zmr_object", "zmr_showValue", "xmfzr", "xmfzr_object", "xmfzr_showValue", "applyStaffName", "applyStaffName_object", "applyStaffCorpId", "applyStaffCorpId_object", "applyStaffdeptName", "applyStaffdeptName_object", "operatorStaffCorpId", "operatorStaffCorpId_object", "operatorStafffdeptName", "operatorStafffdeptName_object"];
   const clone = (value) => value === void 0 ? void 0 : JSON.parse(JSON.stringify(value));
   const id = (form) => String(form?.reimbursementId || form?.id || "");
@@ -46,7 +47,9 @@
     const total = cents(data.totalAmount ?? form.totalAmount), expenseTotal = sum(rows, (r) => { const value = r.BSX070306 ?? r.BSX070304; return value == null || String(value).trim() === "" ? 0 : value; }), receiptTotal = sum(form.receivableInfo, "actualReceivableCurrency");
     const report = { ...workflowStatus({ ...form, state: data.state ?? form.state }), draftId: String(data.id || id(form)), state: data.state ?? form.state, stateName: data.stateName || form.stateName || "", total, expenseTotal, receiptTotal, printTotal: printed, auditKnown, violations: auditKnown ? audit.data.violationList.length : null, warnings: auditKnown ? audit.data.warningList.length : null, issues: [], detailIssues: expenseIssues(form) };
     if (total !== null && expenseTotal !== null && total !== expenseTotal) report.issues.push("费用明细与报销总额不一致");
-    if (total !== null && receiptTotal !== null && total !== receiptTotal) report.issues.push("实收金额与报销总额不一致");
+    const tax = laborTax?.describe({...form,totalAmount:data.totalAmount ?? form.totalAmount});
+    if (tax && total === tax.gross && receiptTotal === tax.net) report.laborTax = tax;
+    else if (total !== null && receiptTotal !== null && total !== receiptTotal) report.issues.push("实收金额与报销总额不一致");
     if (total !== null && printed !== null && total !== printed) report.issues.push("打印报销单金额与后台总额不一致");
     return report;
   }

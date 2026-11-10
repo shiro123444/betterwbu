@@ -16,7 +16,12 @@ async function fixture(visual=true){
  d.querySelector('#submit').onclick=()=>submitted++;
  d.querySelector('.shrinkIcon').onclick=()=>d.querySelector('aside').classList.add('ant-layout-sider-collapsed');
  d.querySelector('.shrinkIcon2').onclick=()=>d.querySelector('aside').classList.remove('ant-layout-sider-collapsed');
- w.eval(fill);w.eval(bundle);await settle();
+ w.eval(fill);w.eval(bundle);
+ // React's first cold render may take more than one timer turn on a busy CI
+ // worker. Wait for the control under test rather than only its portal host.
+ const deadline=Date.now()+2000;
+ while(!d.querySelector('.bw-fill-menu-title')&&Date.now()<deadline)await settle();
+ assert.ok(d.querySelector('.bw-fill-menu-title'),'fill menu should finish its initial render');
  return {w,d,requests,get submitted(){return submitted},async enable(value){settings.enabled=value;for(const fn of listeners)await fn();await settle()},close(){d[Symbol.for('betterwbu.react-workspace')].destroy();w.ReimbursementUI.destroy();w.close()}};
 }
 
