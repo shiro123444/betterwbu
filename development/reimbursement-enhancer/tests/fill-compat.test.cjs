@@ -26,8 +26,8 @@ test('only saved draft state can be captured, and backup is independent of react
  for(const state of [0,6,7,12,99])assert.throws(()=>core.capture({...draft(),state},'g|u'));
  const form=draft();form.payAmount=undefined;const snapshot=core.capture(form,'g|u');form.activitys[0].behaviors.length=0;assert.equal(snapshot.data.activitys[0].behaviors.length,1);
 });
-function bridgeFixture(origin='http://wsbx.wbu.edu.cn',eventOrigin=origin){
- const listeners={},replies=[],calls=[],form=draft(),document={querySelectorAll:()=>[]},location={origin,hash:'#/reimbursementCreate?formEditId=draft-a'},http={post:async()=>({success:true,data:{}})},native={setupState:{formConfig:{},controlsList:[],onClickBtn:async event=>{calls.push(event);if(event.btnEvent.event==='4')await http.post('/reimburse-service/api/v1/reimbursement/ai-again',{id:'draft-a'})}}};
+function bridgeFixture(origin='http://wsbx.wbu.edu.cn',eventOrigin=origin,nativeResponse={success:true,data:{}}){
+ const listeners={},replies=[],calls=[],form=draft(),document={querySelectorAll:()=>[]},location={origin,hash:'#/reimbursementCreate?formEditId=draft-a'},http={post:async()=>nativeResponse},native={setupState:{formConfig:{},controlsList:[],onClickBtn:async event=>{calls.push(event);if(event.btnEvent.event==='4')await http.post('/reimburse-service/api/v1/reimbursement/ai-again',{id:'draft-a'})}}};
  const window={ReimbursementSite:require("../extension/site.js"),ReimbursementFillCompatCore:core,addEventListener:(type,f)=>listeners[type]=f,postMessage:r=>replies.push(r)};
  vm.runInNewContext(fs.readFileSync(__dirname+'/../extension/fill-compat.js','utf8'),{window,document,URL,URLSearchParams,localStorage:{getItem:()=>JSON.stringify({id:'u',groupId:'g'})},location});
  const environment={form:()=>form,http,readDraft:async id=>({success:true,data:{id,state:form.state,reimbursementNo:form.reimbursementNo,totalAmount:form.totalAmount,reimbData:structuredClone(form)}}),readAudit:async()=>({success:true,data:null})};window.ReimbursementFillCompat.bind(environment);window.ReimbursementFillCompat.register(native);
@@ -59,15 +59,19 @@ test('receipt checks stay within the current draft and respect the optimization 
  assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/save',payload)).success,true);
 });
 
-test('expense preflight blocks native submission while preserving incomplete draft saves and generation',async()=>{
+test('business findings remain advisory and native submission preserves manual amounts and payment caps',async()=>{
  const f=bridgeFixture();f.form.formId='c3771358d145490f9e363790c0519fde';
- f.form.activitys=[{activityMetaName:'常规差旅',behaviors:[{behaviorMetaName:'城市间交通费',behaviorDetail:[{BSX070306:1296,BSX0709:[]}]}]}];
+ f.form.activitys=[{activityMetaName:'常规差旅',behaviors:[
+  {behaviorMetaName:'城市间交通费',behaviorDetail:[{BSX070306:1569,BSX0709:[]}]},
+  {behaviorMetaName:'用餐补贴',behaviorDetail:[{BSX070306:180,BTSSX0402:'测试人员',BTSSX0406_BTSSX0407_BTSSX0408:['370000','370200','370211'],BTSSX0403:'2026-06-24',BTSSX0404:'2026-06-26',BTSSX0412:20,BSX071301:' ',BTSSX0409:' '}]}
+ ]}];
+ f.form.totalAmount=2609;f.form.receivableInfo=[{actualReceivableCurrency:1540},{actualReceivableCurrency:960}];
  const payload={id:'draft-a',billVOList:structuredClone(f.form.billVOList),reimbData:structuredClone(f.form)},before=structuredClone(payload);
  const result=await f.http.post('/reimburse-service/api/v1/reimbursement/commit',payload);
- assert.equal(result.code,'ENHANCER_EXPENSES_NOT_READY');assert.match(result.message,/未关联有效发票/);assert.deepEqual(payload,before);
+ assert.equal(result.success,true);assert.equal(result.code,undefined);assert.deepEqual(payload,before);
+ assert.equal(core.expenseIssues(f.form)[0].code,'invoice-missing');
  for(const action of ['save','ai','ai-again'])assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/'+action,payload)).success,true);
- assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/commit',{id:'draft-a'})).code,'ENHANCER_EXPENSES_NOT_READY');
- f.environment.enabled=()=>false;assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/commit',payload)).success,true);
+ assert.equal((await f.http.post('/reimburse-service/api/v1/reimbursement/commit',{id:'draft-a'})).success,true);
 });
 
 test('checking a draft distinguishes unsaved page issues from saved backend issues',async()=>{
@@ -76,6 +80,14 @@ test('checking a draft distinguishes unsaved page issues from saved backend issu
  f.environment.readDraft=async id=>({success:true,data:{id,state:2,reimbData:saved}});
  f.form.activitys=[{behaviors:[{behaviorMetaName:'改签、退票费',behaviorDetail:[{BSX070306:2}]}]}];
  const result=await f.send('server-status');assert.deepEqual(result.report.detailIssues,[]);assert.equal(result.report.currentDetailIssues[0].code,'invoice-missing');assert.equal(f.calls.length,0);
+});
+
+test('advisory checks preserve school validation failures instead of replacing them',async()=>{
+ const nativeResponse={success:false,code:'SCHOOL_VALIDATION',message:'学校系统返回的校验结果'},f=bridgeFixture(undefined,undefined,nativeResponse);
+ f.form.formId='c3771358d145490f9e363790c0519fde';
+ f.form.activitys=[{behaviors:[{behaviorMetaName:'用餐补贴',behaviorDetail:[{BSX070306:180}]}]}];
+ assert.ok(core.expenseIssues(f.form).length);
+ assert.equal(await f.http.post('/reimburse-service/api/v1/reimbursement/commit',{id:'draft-a',billVOList:f.form.billVOList,reimbData:f.form}),nativeResponse);
 });
 
 test('report totals count native blank placeholder rows as zero without hiding invalid amounts',()=>{
@@ -212,11 +224,21 @@ test('an already submitted backend report produces a read-only result even if th
  for(const action of ['capture','run','finish','restore','fill-guard-begin'])assert.equal(f.trace.includes(action),false);f.w.close();
 });
 
-test('check report renders current and saved detail issues separately with actionable row labels',async()=>{
+test('check report keeps actionable row labels and identifies unsaved findings as advisory',async()=>{
  const f=uiFixture(undefined,{currentDetailIssues:[{code:'invoice-missing',message:'常规差旅 / 城市间交通费 / 第1行：未关联有效发票'}],detailIssues:[]});
  await f.ui.load();f.w.document.querySelectorAll('button')[3].click();for(let i=0;i<8;i++)await new Promise(setImmediate);
  const text=f.w.document.body.textContent;
- assert.match(text,/当前页面明细预检（含未保存修改）：1 项待核对/);assert.match(text,/后台已保存明细预检：未发现已知问题/);assert.match(text,/城市间交通费 \/ 第1行：未关联有效发票/);assert.equal(f.trace.includes('capture'),false);f.w.close();
+ assert.match(text,/明细提示：1 行待核对（仅提示，不拦截提交）/);assert.match(text,/城市间交通费 \/ 第1行：未关联有效发票（当前页面）/);assert.equal(f.trace.includes('capture'),false);f.w.close();
+});
+
+test('review merges repeated page and saved findings per row while retaining different sources',async()=>{
+ const label='常规差旅 / 用餐补贴 / 第1行',shared={code:'allowance-dates',label,message:label+'：补贴日期无效'},saved={code:'allowance-person',label,message:label+'：缺少补贴人员'};
+ const f=uiFixture(undefined,{currentDetailIssues:[shared,shared],detailIssues:[shared,saved]});
+ await f.ui.load();f.w.document.querySelectorAll('button')[3].click();for(let i=0;i<8;i++)await new Promise(setImmediate);
+ const lines=[...f.w.document.querySelectorAll('p')].filter(p=>p.textContent.startsWith(label+'：'));assert.equal(lines.length,1);
+ assert.equal((lines[0].textContent.match(/补贴日期无效/g)||[]).length,1);
+ assert.match(lines[0].textContent,/补贴日期无效（当前页面、已保存）/);assert.match(lines[0].textContent,/缺少补贴人员（已保存）/);
+ assert.match(f.w.document.body.textContent,/明细提示：1 行待核对/);f.w.close();
 });
 test('submitted form checks are read-only, and navigating to the list blocks stale-form mutations',async()=>{
  const f=bridgeFixture();f.form.state=9;f.form.aiFlag='true';const original=structuredClone(f.form),result=await f.send('server-status');assert.equal(result.ok,true);assert.equal(result.report.state,9);assert.equal(result.report.fillRecorded,true);assert.equal(result.report.auditKnown,false);assert.deepEqual(f.form,original);assert.equal(f.calls.length,0);

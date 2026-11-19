@@ -21,7 +21,7 @@
     if (typeof form === 'string') { try { form = JSON.parse(form); } catch { return []; } }
     if (form?.formId !== travelForm) return [];
     const issues = [], used = new Map(), periods = new Map();
-    const add = (code, label, message) => issues.push({code, message:label + '：' + message});
+    const add = (code, label, message) => issues.push({code, label, message:label + '：' + message});
     for (const activity of form.activitys || []) for (const behavior of activity.behaviors || []) {
       const category = behavior.behaviorMetaName;
       if (behavior.behaviorKey === 'summary' || category === '总览') continue;
@@ -57,15 +57,13 @@
           const city = text(row.BTSSX0407 || (Array.isArray(place) ? place[1] : ''));
           const rate = amount(row.BSX071301), days = text(row.BTSSX0409) ? Number(row.BTSSX0409) : null;
           const start = day(row.BTSSX0403), end = day(row.BTSSX0404), deduction = amount(row.BTSSX0412 ?? 0);
-          const missing = [];
-          if (!/^\d{6}$/.test(province) || !/^\d{6}$/.test(city)) missing.push('补贴地');
-          if (rate === null || rate <= 0) missing.push('标准');
-          if (!Number.isInteger(days) || days <= 0) missing.push('补贴天数');
-          if (missing.length) add('allowance-basis-missing',label,missing.join('、') + '未就绪。请先在原生表单选择补贴地并等待标准、天数计算，不能只填写金额');
+          if (!/^\d{6}$/.test(province) || !/^\d{6}$/.test(city)) add('allowance-basis-missing',label,'补贴地未填写，请核对');
+          // Native computed fields can remain blank after manual adjustments.
+          // Eligible days may also be fewer than the calendar travel period.
+          const hasBasis = rate !== null && rate > 0 && Number.isInteger(days) && days > 0;
           if (start === null || end === null || end < start) add('allowance-dates',label,'补贴起止日期不完整或无效');
-          else if (days !== null && Number.isInteger(days) && days > 0 && days !== end-start+1) add('allowance-days',label,'补贴天数与起止日期不一致，请核对原生计算结果');
           if (deduction === null || deduction < 0) add('allowance-deduction',label,'扣减金额无效');
-          if (!missing.length && deduction !== null && deduction >= 0 && value > rate*days-deduction) add('allowance-over-limit',label,'金额超过当前标准 × 天数 − 扣减金额，请核对适用条件');
+          if (hasBasis && deduction !== null && deduction >= 0 && value > rate*days-deduction) add('allowance-over-limit',label,'金额超过当前标准 × 天数 − 扣减金额，请核对适用条件');
           const person = text(row.BTSSX0402);
           if (!person) add('allowance-person',label,'缺少补贴人员');
           if (person && start !== null && end !== null && end >= start) {

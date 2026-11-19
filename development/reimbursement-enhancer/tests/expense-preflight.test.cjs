@@ -11,7 +11,7 @@ test('reproduces the four reported problems without changing the draft', () => {
   const before = structuredClone(f), issues = preflight.inspect(f);
   assert.deepEqual(issues.map(i=>i.code),['invoice-missing','invoice-missing','allowance-basis-missing','allowance-basis-missing']);
   assert.match(issues[0].message,/城市间交通费.*1296.00/);
-  assert.match(issues[2].message,/补贴地、标准、补贴天数/);
+  assert.match(issues[2].message,/补贴地未填写/);
   assert.deepEqual(f,before);
 });
 test('valid native links and complete allowance basis pass, with zero support links ignored', () => {
@@ -30,11 +30,11 @@ test('catches invoice reuse across categories using selected source totals and e
   assert.equal(preflight.inspect(f)[0].code,'invoice-reused');
   f.activitys[0].behaviors[1].behaviorDetail[0].BSX070306='0.01';f.activitys[0].behaviors[1].behaviorDetail[0].BSX0709[0].BSX070804='0.01';assert.deepEqual(preflight.inspect(f),[]);
 });
-test('allowance checks actual native basis, deductions, calendar dates and overlap without inventing a policy rate', () => {
+test('allowance advisories use available native basis without requiring computed fields or full-period eligible days', () => {
   const scan=row=>preflight.inspect(form([fee('用餐补贴',row)])).map(i=>i.code);
-  assert.ok(scan({...allowance(),BSX071301:' '}).includes('allowance-basis-missing'));
-  assert.ok(scan({...allowance(),BTSSX0409:' '}).includes('allowance-basis-missing'));
-  assert.ok(scan({...allowance(),BTSSX0409:2}).includes('allowance-days'));
+  assert.deepEqual(scan({...allowance(),BSX071301:' '}),[]);
+  assert.deepEqual(scan({...allowance(),BTSSX0409:' '}),[]);
+  assert.deepEqual(scan({...allowance(),BTSSX0409:2,BSX070306:180,BTSSX0412:20}),[]);
   assert.ok(scan({...allowance(),BTSSX0412:100}).includes('allowance-over-limit'));
   assert.ok(scan({...allowance(),BTSSX0412:-1}).includes('allowance-deduction'));
   assert.ok(scan({...allowance(),BTSSX0403:'2026-02-30'}).includes('allowance-dates'));
@@ -43,6 +43,11 @@ test('allowance checks actual native basis, deductions, calendar dates and overl
   const f=form([fee('用餐补贴',allowance()),fee('用餐补贴',{...allowance(),BTSSX0403:'2026-07-19',BTSSX0404:'2026-07-21'})]);
   assert.ok(preflight.inspect(f).some(i=>i.code==='allowance-overlap'));
   f.activitys[0].behaviors[1].behaviorDetail[0].BTSSX0402='另一人员';assert.deepEqual(preflight.inspect(f),[]);
+});
+
+test('manual meal reimbursement remains unchanged when native rate and days have not calculated',()=>{
+  const f=form([fee('用餐补贴',{...allowance(),BSX070306:180,BSX071301:' ',BTSSX0409:' ',BTSSX0412:20})]),before=structuredClone(f);
+  assert.deepEqual(preflight.inspect(f),[]);assert.deepEqual(f,before);
 });
 test('zero rows and other form schemas are not blocked', () => {
   assert.deepEqual(preflight.inspect(form([fee('用餐补贴',{BSX070306:0})])),[]);

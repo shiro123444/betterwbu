@@ -35,12 +35,8 @@
         if (environment?.enabled?.() !== false && /\/reimbursement\/(?:save|commit|ai|ai-again)(?:\?|$)/.test(String(args[0])) && String(data?.id || core.id(data?.reimbData)) === core.id(current) && core.id(current)) {
           const issue = core.requestIssue(current, data);
           if (issue) return Promise.resolve({ success: false, code: "ENHANCER_TICKETS_NOT_READY", message: issue });
-          // Incomplete drafts must remain saveable. Only the explicit native
-          // submission is stopped; never repair amounts or associations here.
-          if (/\/reimbursement\/commit(?:\?|$)/.test(String(args[0])) && routeId() === core.id(current) && core.eligible(current)) {
-            const issues = core.expenseIssues(data.reimbData || current);
-            if (issues.length) return Promise.resolve({ success:false, code:"ENHANCER_EXPENSES_NOT_READY", message:"明细预检未通过：\n" + issues.map(i => i.message).join("\n") });
-          }
+          // Business findings are advisory in the review panel. The school
+          // validates submissions; this guard only prevents receipt data loss.
         }
         return post.apply(this, args);
       };

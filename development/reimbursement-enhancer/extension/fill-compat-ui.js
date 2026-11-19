@@ -42,12 +42,24 @@
       for (const text of lines) reportArea.append(node("p", text, "muted"));
       if (report.laborTax) reportArea.append(node("p", "劳务费税前 " + money(report.laborTax.gross) + " · 税后 " + money(report.laborTax.net) + " · 差额 " + money(report.laborTax.difference) + "。提交时确认当前金额后继续，不按普通金额不一致拦截；学校原系统仍会校验。", "muted"));
       for (const text of report.issues || []) reportArea.append(node("p", text, "fill-compat-issue"));
-      for (const [title,issues] of [["当前页面明细预检（含未保存修改）",report.currentDetailIssues],["后台已保存明细预检",report.detailIssues]]) {
-        if (!Array.isArray(issues)) continue;
-        reportArea.append(node("p",title + "：" + (issues.length ? issues.length + " 项待核对" : "未发现已知问题"),"muted"));
-        for (const issue of issues) reportArea.append(node("p",issue.message,"fill-compat-issue"));
+      const rows = new Map();
+      for (const [source,issues] of [["当前页面",report.currentDetailIssues],["已保存",report.detailIssues]]) {
+        for (const issue of Array.isArray(issues) ? issues : []) {
+          const split = issue.message.indexOf('：'), label = issue.label || (split >= 0 ? issue.message.slice(0,split) : '单据');
+          const message = split >= 0 ? issue.message.slice(split+1) : issue.message;
+          if (!rows.has(label)) rows.set(label,new Map());
+          const messages = rows.get(label);
+          if (!messages.has(message)) messages.set(message,new Set());
+          messages.get(message).add(source);
+        }
       }
-      if (Array.isArray(report.detailIssues)) reportArea.append(node("p","预检检查票据关联和补贴计算依据；最终有效金额及稽核结果以学校系统为准。","muted"));
+      if (Array.isArray(report.currentDetailIssues) || Array.isArray(report.detailIssues)) {
+        reportArea.append(node("p","明细提示：" + (rows.size ? rows.size + " 行待核对" : "未发现已知问题") + "（仅提示，不拦截提交）","muted"));
+        for (const [label,messages] of rows) {
+          const details = [...messages].map(([message,sources]) => message + '（' + [...sources].join('、') + '）');
+          reportArea.append(node("p",label + '：' + details.join('；'),"fill-compat-issue"));
+        }
+      }
       checkedDraft = report.draftId || "";
       checkedKey = String(report.state) + "|" + String(report.total);
     }
